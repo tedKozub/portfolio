@@ -8,6 +8,11 @@
     cursor: pointer;
   }
 }
+@layer utilities {
+  .frosted-card {
+    @apply backdrop-blur-md border border-white/30 shadow-xl rounded-2xl;
+  }
+}
 :root {
   /* Updated color tokens for black background portfolio design */
   --background: oklch(0.145 0 0); /* Black background */
