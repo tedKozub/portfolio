@@ -1,3 +1,5 @@
+"use client";
+
 import { AnimatedBackground } from "@/components/animated-background";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -11,6 +13,7 @@ import {
   Database,
   Globe,
 } from "lucide-react";
+import Link from "next/link";
 
 export default function Home() {
   return (
@@ -24,23 +27,27 @@ export default function Home() {
             Tadeáš Kozub
           </h1>
           <p className="text-xl md:text-2xl text-muted-foreground mb-8 text-balance">
-            Junior Software Developer
+            Software Developer
           </p>
           <p className="text-lg text-muted-foreground mb-12 max-w-2xl mx-auto text-pretty">
             Computer Science student passionate about building innovative web
-            applications and exploring new technologies.{" "}
+            applications and exploring new technologies.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" className="text-lg px-8">
-              View My Work
+            <Button size="lg" onClick={() => {}} className="text-lg px-8">
+              <Link href="#projects" className="flex items-center">
+                View My Work
+              </Link>
             </Button>
             <Button
               variant="outline"
               size="lg"
               className="text-lg px-8 bg-transparent"
             >
-              <Mail className="mr-2 h-5 w-5" />
-              Get In Touch
+              <Link href="#contact" className="flex items-center">
+                <Mail className="mr-2 h-5 w-5" />
+                Get In Touch
+              </Link>
             </Button>
           </div>
         </div>
@@ -55,14 +62,14 @@ export default function Home() {
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div>
               <p className="text-lg text-muted-foreground mb-6 leading-relaxed">
-                I'm a third-year Computer Science student at UC Berkeley with a
+                I'm a fifth-year Software Engineering student at MU Brno with a
                 passion for full-stack development and problem-solving. I love
                 turning complex problems into simple, beautiful solutions.
               </p>
               <p className="text-lg text-muted-foreground mb-8 leading-relaxed">
-                When I'm not coding, you can find me contributing to open-source
-                projects, participating in hackathons, or exploring the latest
-                in web technologies.
+                When I'm not coding, you can find me learning about new
+                technologies, working on personal projects, or exploring the
+                latest trends in web development.
               </p>
               <div className="flex flex-wrap gap-3">
                 <Badge variant="secondary" className="text-sm px-3 py-1">
@@ -75,7 +82,7 @@ export default function Home() {
                   React
                 </Badge>
                 <Badge variant="secondary" className="text-sm px-3 py-1">
-                  Node.js
+                  Docker
                 </Badge>
                 <Badge variant="secondary" className="text-sm px-3 py-1">
                   Python
@@ -97,21 +104,21 @@ export default function Home() {
                 <Database className="h-8 w-8 mx-auto mb-4 text-primary" />
                 <h3 className="font-semibold mb-2">Backend</h3>
                 <p className="text-sm text-muted-foreground">
-                  Node.js, Express, PostgreSQL
+                  Node.js, Golang, Rust, Python
                 </p>
               </Card>
               <Card className="p-6 text-center">
                 <Globe className="h-8 w-8 mx-auto mb-4 text-primary" />
                 <h3 className="font-semibold mb-2">Tools</h3>
                 <p className="text-sm text-muted-foreground">
-                  Git, Docker, AWS
+                  Git, Docker, Nginx, UNIX
                 </p>
               </Card>
               <Card className="p-6 text-center">
                 <ExternalLink className="h-8 w-8 mx-auto mb-4 text-primary" />
                 <h3 className="font-semibold mb-2">Learning</h3>
                 <p className="text-sm text-muted-foreground">
-                  Go, Kubernetes, ML
+                  K8s, Terraform, PHP
                 </p>
               </Card>
             </div>
@@ -120,7 +127,7 @@ export default function Home() {
       </section>
 
       {/* Projects Section */}
-      <section className="relative z-10 py-20 px-4">
+      <section id="projects" className="relative z-10 py-20 px-4">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-16">
             Featured Projects
@@ -131,30 +138,37 @@ export default function Home() {
                 <div className="h-48 bg-muted/50 rounded-lg mb-4 flex items-center justify-center">
                   <Code className="h-12 w-12 text-muted-foreground" />
                 </div>
-                <h3 className="text-xl font-semibold mb-2">Task Manager App</h3>
-                <p className="text-muted-foreground mb-4">
-                  A full-stack productivity app built with React and Node.js,
-                  featuring real-time collaboration and task tracking.
+                <h3 className="text-xl font-semibold mb-2">SnapShow</h3>
+                <p className="text-muted-foreground mb-16">
+                  A Next.js social network for sharing photos from concerts and
+                  events.
                 </p>
                 <div className="flex flex-wrap gap-2 mb-4">
                   <Badge variant="outline" className="text-xs">
                     React
                   </Badge>
                   <Badge variant="outline" className="text-xs">
-                    Node.js
+                    Next.js
                   </Badge>
                   <Badge variant="outline" className="text-xs">
-                    MongoDB
+                    Tanstack Query
                   </Badge>
                 </div>
                 <div className="flex gap-2">
-                  <Button variant="outline" size="sm">
-                    <Github className="h-4 w-4 mr-2" />
-                    Code
+                  <Button asChild variant="outline" size="sm">
+                    <Link
+                      href="https://github.com/AdamBalu/SnapShow"
+                      target="_blank"
+                    >
+                      <Github className="h-4 w-4 mr-2" />
+                      Code
+                    </Link>
                   </Button>
-                  <Button variant="outline" size="sm">
-                    <ExternalLink className="h-4 w-4 mr-2" />
-                    Demo
+                  <Button asChild variant="outline" size="sm">
+                    <Link href="https://snapshow.vercel.app" target="_blank">
+                      <ExternalLink className="h-4 w-4 mr-2" />
+                      Demo
+                    </Link>
                   </Button>
                 </div>
               </CardContent>
@@ -165,22 +179,21 @@ export default function Home() {
                 <div className="h-48 bg-muted/50 rounded-lg mb-4 flex items-center justify-center">
                   <Database className="h-12 w-12 text-muted-foreground" />
                 </div>
-                <h3 className="text-xl font-semibold mb-2">
-                  Weather Dashboard
-                </h3>
+                <h3 className="text-xl font-semibold mb-2">Stock Exchange</h3>
                 <p className="text-muted-foreground mb-4">
-                  Interactive weather application with data visualization and
-                  location-based forecasts using external APIs.
+                  A Rust-based app built for trading stocks in real time. Lets
+                  users trade and manage their portfolio with a user friendly UI
+                  and dashboards.
                 </p>
                 <div className="flex flex-wrap gap-2 mb-4">
                   <Badge variant="outline" className="text-xs">
-                    JavaScript
+                    Rust
                   </Badge>
                   <Badge variant="outline" className="text-xs">
-                    Chart.js
+                    Postgres
                   </Badge>
                   <Badge variant="outline" className="text-xs">
-                    API
+                    Axum
                   </Badge>
                 </div>
                 <div className="flex gap-2">
@@ -201,28 +214,34 @@ export default function Home() {
                 <div className="h-48 bg-muted/50 rounded-lg mb-4 flex items-center justify-center">
                   <Globe className="h-12 w-12 text-muted-foreground" />
                 </div>
-                <h3 className="text-xl font-semibold mb-2">E-commerce Site</h3>
+                <h3 className="text-xl font-semibold mb-2">Plant Doctor App</h3>
                 <p className="text-muted-foreground mb-4">
-                  Modern e-commerce platform with payment integration, user
-                  authentication, and admin dashboard.
+                  A React Native mobile app that identifies plant diseases using
+                  machine learning and provides care recommendations. trained
+                  models in Python.
                 </p>
                 <div className="flex flex-wrap gap-2 mb-4">
                   <Badge variant="outline" className="text-xs">
-                    Next.js
+                    Python
                   </Badge>
                   <Badge variant="outline" className="text-xs">
-                    Stripe
+                    React Native
                   </Badge>
                   <Badge variant="outline" className="text-xs">
-                    PostgreSQL
+                    TensorFlow
                   </Badge>
                 </div>
                 <div className="flex gap-2">
-                  <Button variant="outline" size="sm">
-                    <Github className="h-4 w-4 mr-2" />
-                    Code
+                  <Button asChild variant="outline" size="sm">
+                    <Link
+                      href="https://github.com/tedKozub/plantDoctor"
+                      target="_blank"
+                    >
+                      <Github className="h-4 w-4 mr-2" />
+                      Code
+                    </Link>
                   </Button>
-                  <Button variant="outline" size="sm">
+                  <Button variant="outline" size="sm" disabled>
                     <ExternalLink className="h-4 w-4 mr-2" />
                     Demo
                   </Button>
@@ -234,7 +253,7 @@ export default function Home() {
       </section>
 
       {/* Contact Section */}
-      <section className="relative z-10 py-20 px-4">
+      <section id="contact" className="relative z-10 py-20 px-4">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-8">Let's Connect</h2>
           <p className="text-lg text-muted-foreground mb-12 text-pretty">
@@ -242,25 +261,38 @@ export default function Home() {
             free to reach out if you'd like to work together!
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
-            <Button size="lg" className="text-lg px-8">
+            <div className="text-lg px-4 py-2 font-semibold flex items-center justify-center bg-primary rounded-md">
               <Mail className="mr-2 h-5 w-5" />
-              alex.chen@email.com
-            </Button>
+              tadeas.kozub&#64;gmail.com
+            </div>
           </div>
           <div className="flex justify-center gap-6">
             <Button
+              asChild
               variant="outline"
               size="icon"
               className="h-12 w-12 bg-transparent"
             >
-              <Github className="h-6 w-6" />
+              <Link
+                href="https://github.com/tedkozub"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <Github className="h-6 w-6" />
+              </Link>
             </Button>
             <Button
               variant="outline"
               size="icon"
               className="h-12 w-12 bg-transparent"
             >
-              <Linkedin className="h-6 w-6" />
+              <Link
+                href="https://www.linkedin.com/in/tadeas-kozub-38b374283"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <Linkedin className="h-6 w-6" />
+              </Link>
             </Button>
           </div>
         </div>
@@ -270,7 +302,7 @@ export default function Home() {
       <footer className="relative z-10 py-8 px-4 border-t border-border">
         <div className="max-w-6xl mx-auto text-center">
           <p className="text-muted-foreground">
-            © 2024 Alex Chen. Built with Next.js and Tailwind CSS.
+            © 2025 Tadeas Kozub. Built with Next.js and Tailwind CSS.
           </p>
         </div>
       </footer>

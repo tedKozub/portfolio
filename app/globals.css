@@ -3,6 +3,11 @@
 
 @custom-variant dark (&:is(.dark *));
 
+@layer base {
+  button, [role="button"] {
+    cursor: pointer;
+  }
+}
 :root {
   /* Updated color tokens for black background portfolio design */
   --background: oklch(0.145 0 0); /* Black background */
@@ -11,13 +16,13 @@
   --card-foreground: oklch(0.985 0 0); /* White text on cards */
   --popover: oklch(0.205 0 0);
   --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.646 0.222 264.376); /* Purple accent */
+--primary:oklch(0.68 0.148 162);
   --primary-foreground: oklch(0.985 0 0);
   --secondary: oklch(0.439 0 0); /* Medium grey */
   --secondary-foreground: oklch(0.985 0 0);
   --muted: oklch(0.269 0 0); /* Dark muted */
   --muted-foreground: oklch(0.708 0 0); /* Light grey text */
-  --accent: oklch(0.646 0.222 264.376); /* Purple accent */
+  --accent: oklch(0.8 0.222 264.376); /* Purple accent */
   --accent-foreground: oklch(0.985 0 0);
   --destructive: oklch(0.577 0.245 27.325);
   --destructive-foreground: oklch(0.985 0 0);
