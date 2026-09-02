@@ -32,7 +32,7 @@ export default function Home() {
       {/* ── Hero – stays clean and minimal ─────────────────────────── */}
       <section className="relative z-10 min-h-screen flex items-center justify-center px-4">
         <div className="max-w-4xl mx-auto text-center">
-          <h1 className="text-5xl md:text-7xl font-bold mb-6 text-balance">
+          <h1 className="text-5xl md:text-7xl font-bold mb-6 text-balance heading-chromatic">
             Tadeáš Kozub
           </h1>
           <p className="text-xl md:text-2xl text-muted-foreground mb-8 text-balance">
@@ -65,7 +65,7 @@ export default function Home() {
       {/* ── About – glass skill cards ───────────────────────────────── */}
       <section className="relative z-10 py-20 px-4">
         <div className="max-w-6xl mx-auto">
-          <h2 className="text-3xl md:text-4xl font-bold text-center mb-16">
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-16 heading-chromatic">
             About Me
           </h2>
           <div className="grid md:grid-cols-2 gap-12 items-center">
@@ -84,7 +84,7 @@ export default function Home() {
               </p>
               <div className="flex flex-wrap gap-2">
                 {SKILLS.map((skill) => (
-                  <Badge key={skill} variant="secondary" className="text-sm px-3 py-1">
+                  <Badge key={skill} variant="secondary" className="text-sm px-3 py-1 badge-chromatic">
                     {skill}
                   </Badge>
                 ))}
@@ -113,7 +113,7 @@ export default function Home() {
       {/* ── Projects – glass cards ──────────────────────────────────── */}
       <section id="projects" className="relative z-10 py-20 px-4">
         <div className="max-w-6xl mx-auto">
-          <h2 className="text-3xl md:text-4xl font-bold text-center mb-16">
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-16 heading-chromatic">
             Featured Projects
           </h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -128,7 +128,7 @@ export default function Home() {
               </p>
               <div className="flex flex-wrap gap-2 mb-4">
                 {["React", "Next.js", "Tanstack Query"].map((t) => (
-                  <Badge key={t} variant="outline" className="text-xs border-white/10">{t}</Badge>
+                  <Badge key={t} variant="outline" className="text-xs border-white/10 badge-chromatic">{t}</Badge>
                 ))}
               </div>
               <div className="flex gap-2">
@@ -156,7 +156,7 @@ export default function Home() {
               </p>
               <div className="flex flex-wrap gap-2 mb-4">
                 {["Rust", "Axum", "PostgreSQL"].map((t) => (
-                  <Badge key={t} variant="outline" className="text-xs border-white/10">{t}</Badge>
+                  <Badge key={t} variant="outline" className="text-xs border-white/10 badge-chromatic">{t}</Badge>
                 ))}
               </div>
               <div className="flex gap-2">
@@ -180,7 +180,7 @@ export default function Home() {
               </p>
               <div className="flex flex-wrap gap-2 mb-4">
                 {["Python", "React Native", "TensorFlow"].map((t) => (
-                  <Badge key={t} variant="outline" className="text-xs border-white/10">{t}</Badge>
+                  <Badge key={t} variant="outline" className="text-xs border-white/10 badge-chromatic">{t}</Badge>
                 ))}
               </div>
               <div className="flex gap-2">
@@ -201,15 +201,15 @@ export default function Home() {
       {/* ── Contact – simple, no glass ─────────────────────────────── */}
       <section id="contact" className="relative z-10 py-20 px-4">
         <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-3xl md:text-4xl font-bold mb-8">Let&apos;s Connect</h2>
+          <h2 className="text-3xl md:text-4xl font-bold mb-8 heading-chromatic">Let&apos;s Connect</h2>
           <p className="text-lg text-muted-foreground mb-12 text-pretty">
             Open to interesting infrastructure challenges, DevOps roles, or
             just a good tech conversation. Drop me a line.
           </p>
           <div className="flex justify-center mb-12">
-            <div className="text-lg px-4 py-2 font-semibold flex items-center justify-center bg-primary rounded-md">
-              <Mail className="mr-2 h-5 w-5" />
-              tadeas.kozub&#64;gmail.com
+            <div className="text-lg px-8 py-4 font-medium flex items-center justify-center bg-black/50 border border-white/10 rounded-2xl shadow-xl backdrop-blur-md transition-all hover:bg-black/80 hover:border-white/20 cursor-pointer">
+              <Mail className="mr-3 h-6 w-6 text-muted-foreground" />
+              <span className="text-white">tadeas.kozub&#64;gmail.com</span>
             </div>
           </div>
           <div className="flex justify-center gap-6">
