@@ -225,20 +225,20 @@ export function AnimatedBackground() {
           const py = b.y + cy + Math.sin(globalAngle) * localR;
 
           const dist = Math.hypot(px - mx, py - my);
-          const interactionRadius = mobile ? 80 : 140;
+          const interactionRadius = mobile ? 50 : 90;
 
           let force = 0;
           if (dist < interactionRadius && dist > 1) {
             const proximity = Math.pow((interactionRadius - dist) / interactionRadius, 2);
             // Dot product of mouse velocity and radial outward vector
             const dot = mvx * Math.cos(globalAngle) + mvy * Math.sin(globalAngle);
-            force = dot * proximity * 0.8; // tuning push strength
+            force = dot * proximity * 0.5; // less extreme push/pull
           }
 
           const d = defs[pIdx];
           // Spring physics: stiffness (k) and damping
-          const k = 0.15; // increased stiffness so it snaps back faster
-          const damp = 0.70; // increased damping so it bounces less
+          const k = 0.25; // much stiffer
+          const damp = 0.55; // damp out quickly, almost no bounce
           d.vel += force;
           d.vel -= d.val * k;
           d.vel *= damp;

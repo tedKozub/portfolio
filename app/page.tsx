@@ -30,23 +30,23 @@ export default function Home() {
       <AnimatedBackground />
 
       {/* ── Hero – stays clean and minimal ─────────────────────────── */}
-      <section className="relative z-10 min-h-screen flex items-center justify-center px-4">
-        <div className="max-w-4xl mx-auto text-center">
-          <h1 className="text-5xl md:text-7xl font-semibold mb-12 text-balance heading-chromatic animate-fade-in-up">
-            <span className="text-xl md:text-3xl font-light text-muted-foreground mr-3 align-middle">Ing.</span>
+      <section className="relative z-10 min-h-screen flex items-center justify-center px-4 sm:px-6">
+        <div className="max-w-4xl mx-auto text-center w-full">
+          <h1 className="text-4xl sm:text-5xl md:text-7xl font-semibold mb-8 sm:mb-12 text-balance heading-chromatic animate-fade-in-up leading-tight">
+            <span className="text-lg sm:text-xl md:text-3xl font-light text-muted-foreground mr-2 sm:mr-3 align-middle block sm:inline mb-2 sm:mb-0">Ing.</span>
             Tadeáš Kozub
           </h1>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" className="text-lg px-8 font-light" asChild>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center w-full max-w-sm sm:max-w-none mx-auto">
+            <Button size="lg" className="text-base sm:text-lg px-8 font-light w-full sm:w-auto h-12 sm:h-auto" asChild>
               <Link href="#projects">View My Work</Link>
             </Button>
             <Button
               variant="outline"
               size="lg"
-              className="text-lg px-8 bg-transparent border-black/10 dark:border-white/10 font-light"
+              className="text-base sm:text-lg px-8 bg-transparent border-black/10 dark:border-white/10 font-light w-full sm:w-auto h-12 sm:h-auto"
               asChild
             >
-              <Link href="#contact" className="flex items-center">
+              <Link href="#contact" className="flex items-center justify-center">
                 <Mail className="mr-2 h-5 w-5" />
                 Get In Touch
               </Link>
@@ -56,7 +56,7 @@ export default function Home() {
       </section>
 
       {/* ── About – glass skill cards ───────────────────────────────── */}
-      <section className="relative z-10 py-20 px-4">
+      <section className="relative z-10 py-16 md:py-24 px-4 sm:px-6">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-medium text-center mb-16 heading-chromatic">
             About Me
@@ -86,7 +86,7 @@ export default function Home() {
             </div>
 
             {/* Glass skill cards */}
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {[
                 { icon: Code,        title: "Web Dev",          sub: "React, TypeScript, Next.js, Tailwind" },
                 { icon: Server,      title: "DevOps & Infra",  sub: "Kubernetes, Terraform, Ansible, CI/CD" },
@@ -105,7 +105,7 @@ export default function Home() {
       </section>
 
       {/* ── Projects – glass cards ──────────────────────────────────── */}
-      <section id="projects" className="relative z-10 py-20 px-4">
+      <section id="projects" className="relative z-10 py-16 md:py-24 px-4 sm:px-6">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-medium text-center mb-16 heading-chromatic">
             Featured Projects
@@ -178,7 +178,7 @@ export default function Home() {
       </section>
 
       {/* ── Contact – simple, no glass ─────────────────────────────── */}
-      <section id="contact" className="relative z-10 py-20 px-4">
+      <section id="contact" className="relative z-10 py-16 md:py-24 px-4 sm:px-6">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-3xl md:text-4xl font-medium mb-8 heading-chromatic">Let&apos;s Connect</h2>
           <p className="text-lg text-muted-foreground mb-12 text-pretty">
@@ -186,9 +186,9 @@ export default function Home() {
             just a good tech conversation. Drop me a line.
           </p>
           <div className="flex justify-center mb-12">
-            <div className="text-lg px-8 py-4 font-normal flex items-center justify-center bg-black/5 dark:bg-black/50 border border-black/10 dark:border-white/10 rounded-2xl shadow-xl backdrop-blur-md transition-all hover:bg-black/10 dark:hover:bg-black/80 hover:border-black/20 dark:hover:border-white/20 cursor-pointer text-foreground">
-              <Mail className="mr-3 h-6 w-6 text-muted-foreground" />
-              <span>tadeas.kozub&#64;gmail.com</span>
+            <div className="text-base sm:text-lg px-4 sm:px-8 py-3 sm:py-4 font-normal flex items-center justify-center bg-black/5 dark:bg-black/50 border border-black/10 dark:border-white/10 rounded-2xl shadow-xl backdrop-blur-md transition-all hover:bg-black/10 dark:hover:bg-black/80 hover:border-black/20 dark:hover:border-white/20 cursor-pointer text-foreground break-all max-w-full">
+              <Mail className="mr-2 sm:mr-3 h-5 w-5 sm:h-6 sm:w-6 text-muted-foreground shrink-0" />
+              <span className="truncate">tadeas.kozub&#64;gmail.com</span>
             </div>
           </div>
           <div className="flex justify-center gap-6">
@@ -208,9 +208,9 @@ export default function Home() {
 
 
       {/* ── Footer ─────────────────────────────────────────────────── */}
-      <footer className="relative z-10 py-8 px-4 border-t border-black/10 dark:border-white/10 bg-white/30 dark:bg-black/20 backdrop-blur-md transition-colors duration-500">
+      <footer className="relative z-10 py-8 px-4 sm:px-6 border-t border-black/10 dark:border-white/10 bg-white/30 dark:bg-black/20 backdrop-blur-md transition-colors duration-500">
         <div className="max-w-6xl mx-auto text-center">
-          <p className="text-muted-foreground text-sm">
+          <p className="text-muted-foreground text-xs sm:text-sm">
             © 2026 Tadeáš Kozub. Built with Next.js and Tailwind CSS.
           </p>
         </div>
