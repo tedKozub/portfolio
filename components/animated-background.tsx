@@ -1,26 +1,22 @@
 "use client";
 
-import { useEffect, useRef, useCallback } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 
 /*
-  Large, smooth, organic SVG blobs.
-  Uses SVG filters (feTurbulence + feDisplacementMap) to create a "brush stroke" texture.
-  Longer dashed lines with gaps for a sketched, painterly look.
-  Chromatic aberration layered channels.
+  Organic SVG blobs with local stroke interaction (mouse dents the stroke).
+  Canvas particle system trailing the blobs.
+  Mobile optimized (fewer blobs, fewer particles, SVG filter disabled on small screens).
 */
 
 function polarToCart(cx: number, cy: number, angle: number, r: number) {
   return { x: cx + Math.cos(angle) * r, y: cy + Math.sin(angle) * r };
 }
 
-// Lower tension (0.3) for rounder, less spiky curves
 function buildSmoothPath(points: { x: number; y: number }[]): string {
   const n = points.length;
   if (n < 3) return "";
-
   const tension = 0.35;
   let d = `M ${points[0].x.toFixed(1)} ${points[0].y.toFixed(1)}`;
-
   for (let i = 0; i < n; i++) {
     const p0 = points[(i - 1 + n) % n];
     const p1 = points[i];
@@ -34,19 +30,16 @@ function buildSmoothPath(points: { x: number; y: number }[]): string {
 
     d += ` C ${cp1x.toFixed(1)} ${cp1y.toFixed(1)}, ${cp2x.toFixed(1)} ${cp2y.toFixed(1)}, ${p2.x.toFixed(1)} ${p2.y.toFixed(1)}`;
   }
-
   return d + " Z";
 }
 
-// Fewer points (7) + very gentle noise = perfectly smooth, rounded blob (no points)
-const NUM_CTRL_POINTS = 7;
+const NUM_CTRL_POINTS = 8; // Keep it low for maximum smoothness
 
 function generateRadii(baseR: number, seed: number): number[] {
   const radii: number[] = [];
   for (let i = 0; i < NUM_CTRL_POINTS; i++) {
     const angle = (Math.PI * 2 * i) / NUM_CTRL_POINTS;
-    // Gentle sine waves to keep it round and blobby
-    const n1 = Math.sin(angle * 1 + seed * 3.17) * 0.12; 
+    const n1 = Math.sin(angle * 1 + seed * 3.17) * 0.12;
     const n2 = Math.cos(angle * 2 + seed * 7.31) * 0.08;
     radii.push(baseR * (1 + n1 + n2));
   }
@@ -61,46 +54,76 @@ function radiiToPoints(radii: number[], cx: number, cy: number): { x: number; y:
   });
 }
 
-interface BlobDef {
-  size: number;
-  baseR: number;
-  borderWidth: number;
-  morphSpeed: number;
-  seeds: [number, number, number];
-}
-
-// Even larger blobs
-const BLOBS: BlobDef[] = [
+const BLOBS = [
   { size: 700, baseR: 290, borderWidth: 1.5, morphSpeed: 0.0003,  seeds: [1.2, 5.7, 9.3] },
   { size: 600, baseR: 240, borderWidth: 2,   morphSpeed: 0.00025, seeds: [3.4, 7.1, 2.8] },
   { size: 850, baseR: 360, borderWidth: 1.5, morphSpeed: 0.00028, seeds: [6.5, 0.9, 4.6] },
   { size: 550, baseR: 220, borderWidth: 2,   morphSpeed: 0.00022, seeds: [8.2, 3.3, 7.9] },
 ];
 
-// Chromatic channels with long "brush stroke" dashed patterns
 const CHANNELS = [
   { color: "rgba(255, 60, 60, 0.25)",   dx: -4, dy: -3, dash: "90 40 20 50" }, // Red
   { color: "rgba(200, 200, 200, 0.20)", dx: 0,  dy: 0,  dash: "120 70" },      // Grey
   { color: "rgba(60, 100, 255, 0.25)",   dx: 4,  dy: 3,  dash: "50 60 110 40" }, // Blue
 ];
 
-const BLOB_TARGETS = BLOBS.map((b) =>
-  b.seeds.map((seed) => generateRadii(b.baseR, seed))
-);
+const BLOB_TARGETS = BLOBS.map((b) => b.seeds.map((seed) => generateRadii(b.baseR, seed)));
 
 function lerpRadii(a: number[], b: number[], t: number): number[] {
   return a.map((v, i) => v + (b[i] - v) * t);
 }
 
-const REPEL_RADIUS = 350;
-const REPEL_STRENGTH = 5;
+// Particle class for the trailing dust effect
+class Particle {
+  x: number;
+  y: number;
+  vx: number;
+  vy: number;
+  life: number;
+  decay: number;
+  color: string;
+  size: number;
+
+  constructor(x: number, y: number, color: string) {
+    this.x = x;
+    this.y = y;
+    this.vx = (Math.random() - 0.5) * 1.5;
+    this.vy = (Math.random() - 0.5) * 1.5 - 0.5; // slight upward drift
+    this.life = 1.0;
+    this.decay = Math.random() * 0.01 + 0.005;
+    this.color = color;
+    this.size = Math.random() * 2 + 0.5;
+  }
+
+  update() {
+    this.x += this.vx;
+    this.y += this.vy;
+    this.life -= this.decay;
+  }
+
+  draw(ctx: CanvasRenderingContext2D) {
+    ctx.globalAlpha = Math.max(0, this.life * 0.6);
+    ctx.fillStyle = this.color;
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+    ctx.fill();
+  }
+}
+
+const PARTICLE_COLORS = ["255, 60, 60", "200, 200, 200", "60, 100, 255"];
 
 export function AnimatedBackground() {
   const svgRefs = useRef<(SVGSVGElement | null)[]>([]);
   const pathRefs = useRef<(SVGPathElement | null)[][]>(BLOBS.map(() => [null, null, null]));
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const particlesRef = useRef<Particle[]>([]);
+  
   const stateRef = useRef<{ x: number; y: number; vx: number; vy: number; rot: number }[]>([]);
   const mouse = useRef({ x: -9999, y: -9999 });
   const raf = useRef(0);
+  
+  const [isMobile, setIsMobile] = useState(false);
+  const isMobileRef = useRef(false);
 
   const init = useCallback(() => {
     const W = window.innerWidth;
@@ -110,11 +133,27 @@ export function AnimatedBackground() {
       y: H * 0.1 + Math.random() * H * 0.6,
       vx: (Math.random() - 0.5) * 0.5,
       vy: (Math.random() - 0.5) * 0.5,
-      rot: Math.random() * 360, // Slow rotation
+      rot: Math.random() * 360,
     }));
   }, []);
 
   useEffect(() => {
+    const handleResize = () => {
+      const mobile = window.innerWidth < 768;
+      setIsMobile(mobile);
+      isMobileRef.current = mobile;
+
+      if (canvasRef.current) {
+        const dpr = window.devicePixelRatio || 1;
+        canvasRef.current.width = window.innerWidth * dpr;
+        canvasRef.current.height = window.innerHeight * dpr;
+        const ctx = canvasRef.current.getContext("2d");
+        if (ctx) ctx.scale(dpr, dpr);
+      }
+    };
+    
+    handleResize();
+    window.addEventListener("resize", handleResize);
     init();
 
     const onMouse = (e: MouseEvent) => {
@@ -126,22 +165,58 @@ export function AnimatedBackground() {
       const W = window.innerWidth;
       const H = window.innerHeight;
       const { x: mx, y: my } = mouse.current;
+      const mobile = isMobileRef.current;
+      const activeBlobs = mobile ? 2 : 4; // Render fewer blobs on mobile for performance
 
-      stateRef.current.forEach((b, i) => {
+      // Update Canvas Particles
+      if (canvasRef.current) {
+        const ctx = canvasRef.current.getContext("2d");
+        if (ctx) {
+          ctx.clearRect(0, 0, W, H);
+          for (let i = particlesRef.current.length - 1; i >= 0; i--) {
+            const p = particlesRef.current[i];
+            p.update();
+            p.draw(ctx);
+            if (p.life <= 0) particlesRef.current.splice(i, 1);
+          }
+        }
+      }
+
+      stateRef.current.slice(0, activeBlobs).forEach((b, i) => {
         const blob = BLOBS[i];
         const size = blob.size;
         const cx = size / 2;
         const cy = size / 2;
 
-        // Morph path
         const targets = BLOB_TARGETS[i];
         const phase = (time * blob.morphSpeed) % 3;
         const seg = Math.floor(phase);
         const t = phase - seg;
-        // Smooth easing
         const eased = t * t * (3 - 2 * t);
-        const currentRadii = lerpRadii(targets[seg % 3], targets[(seg + 1) % 3], eased);
-        const pts = radiiToPoints(currentRadii, cx, cy);
+        const baseRadii = lerpRadii(targets[seg % 3], targets[(seg + 1) % 3], eased);
+
+        // Deform stroke based on mouse proximity
+        const deformedRadii = baseRadii.map((localR, pIdx) => {
+          const localAngle = (Math.PI * 2 * pIdx) / NUM_CTRL_POINTS;
+          const globalAngle = localAngle + (b.rot * Math.PI / 180);
+          
+          // Absolute position of this control point
+          const px = b.x + cx + Math.cos(globalAngle) * localR;
+          const py = b.y + cy + Math.sin(globalAngle) * localR;
+
+          const dist = Math.hypot(px - mx, py - my);
+          const interactionRadius = mobile ? 140 : 250;
+
+          if (dist < interactionRadius) {
+            // Mouse dents the stroke inward
+            const force = Math.pow((interactionRadius - dist) / interactionRadius, 1.5);
+            const maxPush = mobile ? 60 : 120;
+            return Math.max(localR * 0.3, localR - force * maxPush); // prevent breaking the path
+          }
+          return localR;
+        });
+
+        const pts = radiiToPoints(deformedRadii, cx, cy);
         const pathD = buildSmoothPath(pts);
 
         for (let ch = 0; ch < 3; ch++) {
@@ -149,23 +224,36 @@ export function AnimatedBackground() {
           if (pEl) pEl.setAttribute("d", pathD);
         }
 
-        // Mouse repulsion
+        // Spawn particles trailing from the stroke
+        if (Math.random() < (mobile ? 0.05 : 0.12)) {
+          const pIdx = Math.floor(Math.random() * NUM_CTRL_POINTS);
+          const localR = deformedRadii[pIdx];
+          const localAngle = (Math.PI * 2 * pIdx) / NUM_CTRL_POINTS;
+          const globalAngle = localAngle + (b.rot * Math.PI / 180);
+          
+          const px = b.x + cx + Math.cos(globalAngle) * localR;
+          const py = b.y + cy + Math.sin(globalAngle) * localR;
+          
+          const color = `rgb(${PARTICLE_COLORS[Math.floor(Math.random() * PARTICLE_COLORS.length)]})`;
+          particlesRef.current.push(new Particle(px, py, color));
+        }
+
+        // Weak center repulsion to keep them drifting slightly away
         const dxM = b.x + cx - mx;
         const dyM = b.y + cy - my;
         const distM = Math.hypot(dxM, dyM);
-
-        if (distM < REPEL_RADIUS && distM > 1) {
-          const force = ((REPEL_RADIUS - distM) / REPEL_RADIUS) * REPEL_STRENGTH;
-          b.vx += (dxM / distM) * force * 0.02;
-          b.vy += (dyM / distM) * force * 0.02;
+        if (distM < 300 && distM > 1) {
+          const force = (300 - distM) / 300;
+          b.vx += (dxM / distM) * force * 0.01;
+          b.vy += (dyM / distM) * force * 0.01;
         }
 
-        // Autonomous drift & slow rotation
+        // Drift & rotate
         b.vx += (Math.random() - 0.5) * 0.03;
         b.vy += (Math.random() - 0.5) * 0.03;
         b.vx *= 0.998;
         b.vy *= 0.998;
-        b.rot += 0.02; // continuously rotate very slowly
+        b.rot += 0.03;
 
         const spd = Math.hypot(b.vx, b.vy);
         if (spd > 0.8) { b.vx = (b.vx / spd) * 0.8; b.vy = (b.vy / spd) * 0.8; }
@@ -173,7 +261,7 @@ export function AnimatedBackground() {
         b.x += b.vx;
         b.y += b.vy;
 
-        // Soft boundaries
+        // Soft bounds
         const margin = size * 0.1;
         if (b.x < -margin)   b.vx += 0.15;
         if (b.x > W + margin) b.vx -= 0.15;
@@ -193,37 +281,46 @@ export function AnimatedBackground() {
 
     return () => {
       window.removeEventListener("mousemove", onMouse);
+      window.removeEventListener("resize", handleResize);
       cancelAnimationFrame(raf.current);
     };
   }, [init]);
 
+  const activeBlobs = isMobile ? 2 : 4;
+
   return (
     <div className="fixed inset-0 overflow-hidden pointer-events-none" aria-hidden>
-      {/* SVG Filters for Brush Texture */}
-      <svg width="0" height="0" className="absolute">
-        <defs>
-          <filter id="brush-texture" x="-20%" y="-20%" width="140%" height="140%">
-            <feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="3" result="noise" />
-            <feDisplacementMap in="SourceGraphic" in2="noise" scale="12" xChannelSelector="R" yChannelSelector="G" />
-          </filter>
-        </defs>
-      </svg>
+      {/* Canvas for Particles */}
+      <canvas
+        ref={canvasRef}
+        className="absolute inset-0 z-0"
+        style={{ width: "100%", height: "100%" }}
+      />
 
-      {BLOBS.map(({ size, borderWidth }, i) => (
+      {/* SVG Filters (disabled on mobile for performance) */}
+      {!isMobile && (
+        <svg width="0" height="0" className="absolute">
+          <defs>
+            <filter id="brush-texture" x="-20%" y="-20%" width="140%" height="140%">
+              <feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="3" result="noise" />
+              <feDisplacementMap in="SourceGraphic" in2="noise" scale="12" xChannelSelector="R" yChannelSelector="G" />
+            </filter>
+          </defs>
+        </svg>
+      )}
+
+      {/* Blobs */}
+      {BLOBS.slice(0, activeBlobs).map(({ size, borderWidth }, i) => (
         <svg
           key={i}
           ref={(el) => { svgRefs.current[i] = el; }}
           width={size}
           height={size}
           viewBox={`0 0 ${size} ${size}`}
-          style={{
-            position: "absolute",
-            top: 0,
-            left: 0,
-            willChange: "transform",
-          }}
+          className="z-10 absolute top-0 left-0"
+          style={{ willChange: "transform" }}
         >
-          <g filter="url(#brush-texture)">
+          <g filter={!isMobile ? "url(#brush-texture)" : undefined}>
             {CHANNELS.map(({ color, dx, dy, dash }, ch) => (
               <g key={ch} transform={`translate(${dx}, ${dy})`}>
                 <path
