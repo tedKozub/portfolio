@@ -118,8 +118,8 @@ export function AnimatedBackground() {
             width: size,
             height: size,
             borderRadius: "50%",
-            // Grey-white fill at low opacity — keeps it subtle against dark bg
-            background: "rgba(255, 255, 255, 0.22)",
+            // Muted cool blue-grey — not pure white, feels atmospheric
+            background: "rgba(148, 168, 196, 0.26)",
             willChange: "transform",
           }}
         />

@@ -2,7 +2,6 @@
 
 import { AnimatedBackground } from "@/components/animated-background";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
   Github,
@@ -19,12 +18,18 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 
+const SKILLS = [
+  "Kubernetes", "Terraform", "Ansible", "Docker",
+  "CI/CD", "Networking", "Python", "Rust",
+  "Go", "Vector DBs", "RAG", "PostgreSQL",
+];
+
 export default function Home() {
   return (
     <main className="min-h-screen relative">
       <AnimatedBackground />
 
-      {/* Hero Section */}
+      {/* ── Hero – stays clean and minimal ─────────────────────────── */}
       <section className="relative z-10 min-h-screen flex items-center justify-center px-4">
         <div className="max-w-4xl mx-auto text-center">
           <h1 className="text-5xl md:text-7xl font-bold mb-6 text-balance">
@@ -40,9 +45,7 @@ export default function Home() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button size="lg" className="text-lg px-8" asChild>
-              <Link href="#projects">
-                View My Work
-              </Link>
+              <Link href="#projects">View My Work</Link>
             </Button>
             <Button
               variant="outline"
@@ -59,13 +62,14 @@ export default function Home() {
         </div>
       </section>
 
-      {/* About Section */}
+      {/* ── About – glass skill cards ───────────────────────────────── */}
       <section className="relative z-10 py-20 px-4">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-16">
             About Me
           </h2>
           <div className="grid md:grid-cols-2 gap-12 items-center">
+            {/* Bio */}
             <div>
               <p className="text-lg text-muted-foreground mb-6 leading-relaxed">
                 I&apos;m a fulltime DevOps engineer focused on building
@@ -78,164 +82,123 @@ export default function Home() {
                 databases, diving deep into networking, and occasionally
                 shipping side projects.
               </p>
-              <div className="flex flex-wrap gap-3">
-                {[
-                  "Kubernetes",
-                  "Terraform",
-                  "Ansible",
-                  "Docker",
-                  "CI/CD",
-                  "Networking",
-                  "Python",
-                  "Rust",
-                  "Go",
-                  "Vector DBs",
-                  "RAG",
-                  "PostgreSQL",
-                ].map((skill) => (
+              <div className="flex flex-wrap gap-2">
+                {SKILLS.map((skill) => (
                   <Badge key={skill} variant="secondary" className="text-sm px-3 py-1">
                     {skill}
                   </Badge>
                 ))}
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-6">
-              <Card className="p-6 text-center">
-                <Server className="h-8 w-8 mx-auto mb-4 text-primary" />
-                <h3 className="font-semibold mb-2">DevOps & Infra</h3>
-                <p className="text-sm text-muted-foreground">
-                  Kubernetes, Terraform, Ansible, CI/CD
-                </p>
-              </Card>
-              <Card className="p-6 text-center">
-                <Network className="h-8 w-8 mx-auto mb-4 text-primary" />
-                <h3 className="font-semibold mb-2">Networking</h3>
-                <p className="text-sm text-muted-foreground">
-                  BGP, VLANs, DNS, Load Balancing
-                </p>
-              </Card>
-              <Card className="p-6 text-center">
-                <BrainCircuit className="h-8 w-8 mx-auto mb-4 text-primary" />
-                <h3 className="font-semibold mb-2">AI / RAG</h3>
-                <p className="text-sm text-muted-foreground">
-                  Vector DBs, Embeddings, LLM Pipelines
-                </p>
-              </Card>
-              <Card className="p-6 text-center">
-                <Code className="h-8 w-8 mx-auto mb-4 text-primary" />
-                <h3 className="font-semibold mb-2">Development</h3>
-                <p className="text-sm text-muted-foreground">
-                  Rust, Go, Python, Node.js
-                </p>
-              </Card>
+
+            {/* Glass skill cards */}
+            <div className="grid grid-cols-2 gap-4">
+              {[
+                { icon: Server,      title: "DevOps & Infra",  sub: "Kubernetes, Terraform, Ansible, CI/CD" },
+                { icon: Network,     title: "Networking",       sub: "BGP, VLANs, DNS, Load Balancing" },
+                { icon: BrainCircuit,title: "AI / RAG",         sub: "Vector DBs, Embeddings, LLM Pipelines" },
+                { icon: Code,        title: "Development",      sub: "Rust, Go, Python, Node.js" },
+              ].map(({ icon: Icon, title, sub }) => (
+                <div key={title} className="glass-card p-6 text-center">
+                  <Icon className="h-7 w-7 mx-auto mb-4 text-primary" />
+                  <h3 className="font-semibold mb-2">{title}</h3>
+                  <p className="text-sm text-muted-foreground">{sub}</p>
+                </div>
+              ))}
             </div>
           </div>
         </div>
       </section>
 
-      {/* Projects Section */}
+      {/* ── Projects – glass cards ──────────────────────────────────── */}
       <section id="projects" className="relative z-10 py-20 px-4">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-16">
             Featured Projects
           </h2>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <Card className="group hover:shadow-lg transition-shadow duration-300">
-              <CardContent className="p-6">
-                <div className="h-48 bg-muted/50 rounded-lg mb-4 flex items-center justify-center">
-                  <Globe className="h-12 w-12 text-muted-foreground" />
-                </div>
-                <h3 className="text-xl font-semibold mb-2">SnapShow</h3>
-                <p className="text-muted-foreground mb-4">
-                  A Next.js social network for sharing photos from concerts and
-                  events.
-                </p>
-                <div className="flex flex-wrap gap-2 mb-4">
-                  <Badge variant="outline" className="text-xs">React</Badge>
-                  <Badge variant="outline" className="text-xs">Next.js</Badge>
-                  <Badge variant="outline" className="text-xs">Tanstack Query</Badge>
-                </div>
-                <div className="flex gap-2">
-                  <Button asChild variant="outline" size="sm">
-                    <Link href="https://github.com/AdamBalu/SnapShow" target="_blank">
-                      <Github className="h-4 w-4 mr-2" />
-                      Code
-                    </Link>
-                  </Button>
-                  <Button asChild variant="outline" size="sm">
-                    <Link href="https://snapshow.vercel.app" target="_blank">
-                      <ExternalLink className="h-4 w-4 mr-2" />
-                      Demo
-                    </Link>
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {/* SnapShow */}
+            <div className="glass-card p-6 flex flex-col">
+              <div className="h-44 rounded-xl mb-5 flex items-center justify-center bg-white/[0.03] border border-white/[0.05]">
+                <Globe className="h-10 w-10 text-muted-foreground/50" />
+              </div>
+              <h3 className="text-xl font-semibold mb-2">SnapShow</h3>
+              <p className="text-muted-foreground text-sm leading-relaxed mb-5 flex-1">
+                A Next.js social network for sharing photos from concerts and events.
+              </p>
+              <div className="flex flex-wrap gap-2 mb-4">
+                {["React", "Next.js", "Tanstack Query"].map((t) => (
+                  <Badge key={t} variant="outline" className="text-xs border-white/10">{t}</Badge>
+                ))}
+              </div>
+              <div className="flex gap-2">
+                <Button asChild variant="outline" size="sm" className="bg-transparent border-white/10 hover:bg-white/5">
+                  <Link href="https://github.com/AdamBalu/SnapShow" target="_blank">
+                    <Github className="h-4 w-4 mr-2" />Code
+                  </Link>
+                </Button>
+                <Button asChild variant="outline" size="sm" className="bg-transparent border-white/10 hover:bg-white/5">
+                  <Link href="https://snapshow.vercel.app" target="_blank">
+                    <ExternalLink className="h-4 w-4 mr-2" />Demo
+                  </Link>
+                </Button>
+              </div>
+            </div>
 
-            <Card className="group hover:shadow-lg transition-shadow duration-300">
-              <CardContent className="p-6">
-                <div className="h-48 bg-muted/50 rounded-lg mb-4 flex items-center justify-center">
-                  <Database className="h-12 w-12 text-muted-foreground" />
-                </div>
-                <h3 className="text-xl font-semibold mb-2">Stock Exchange</h3>
-                <p className="text-muted-foreground mb-4">
-                  A Rust-based app built for trading stocks in real time. Lets
-                  users trade and manage their portfolio with a user friendly UI
-                  and dashboards.
-                </p>
-                <div className="flex flex-wrap gap-2 mb-4">
-                  <Badge variant="outline" className="text-xs">Rust</Badge>
-                  <Badge variant="outline" className="text-xs">Axum</Badge>
-                  <Badge variant="outline" className="text-xs">PostgreSQL</Badge>
-                </div>
-                <div className="flex gap-2">
-                  <Button variant="outline" size="sm" disabled>
-                    <Github className="h-4 w-4 mr-2" />
-                    Code
-                  </Button>
-                  <Button variant="outline" size="sm" disabled>
-                    <ExternalLink className="h-4 w-4 mr-2" />
-                    Demo
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
+            {/* Stock Exchange */}
+            <div className="glass-card p-6 flex flex-col">
+              <div className="h-44 rounded-xl mb-5 flex items-center justify-center bg-white/[0.03] border border-white/[0.05]">
+                <Database className="h-10 w-10 text-muted-foreground/50" />
+              </div>
+              <h3 className="text-xl font-semibold mb-2">Stock Exchange</h3>
+              <p className="text-muted-foreground text-sm leading-relaxed mb-5 flex-1">
+                A Rust-based app for trading stocks in real time with a low-latency Axum backend and clean dashboards.
+              </p>
+              <div className="flex flex-wrap gap-2 mb-4">
+                {["Rust", "Axum", "PostgreSQL"].map((t) => (
+                  <Badge key={t} variant="outline" className="text-xs border-white/10">{t}</Badge>
+                ))}
+              </div>
+              <div className="flex gap-2">
+                <Button variant="outline" size="sm" disabled className="border-white/10">
+                  <Github className="h-4 w-4 mr-2" />Code
+                </Button>
+                <Button variant="outline" size="sm" disabled className="border-white/10">
+                  <ExternalLink className="h-4 w-4 mr-2" />Demo
+                </Button>
+              </div>
+            </div>
 
-            <Card className="group hover:shadow-lg transition-shadow duration-300">
-              <CardContent className="p-6">
-                <div className="h-48 bg-muted/50 rounded-lg mb-4 flex items-center justify-center">
-                  <Container className="h-12 w-12 text-muted-foreground" />
-                </div>
-                <h3 className="text-xl font-semibold mb-2">Plant Doctor</h3>
-                <p className="text-muted-foreground mb-4">
-                  A React Native mobile app that identifies plant diseases using
-                  machine learning and provides care recommendations. Models
-                  trained in Python with TensorFlow.
-                </p>
-                <div className="flex flex-wrap gap-2 mb-4">
-                  <Badge variant="outline" className="text-xs">Python</Badge>
-                  <Badge variant="outline" className="text-xs">React Native</Badge>
-                  <Badge variant="outline" className="text-xs">TensorFlow</Badge>
-                </div>
-                <div className="flex gap-2">
-                  <Button asChild variant="outline" size="sm">
-                    <Link href="https://github.com/tedKozub/plantDoctor" target="_blank">
-                      <Github className="h-4 w-4 mr-2" />
-                      Code
-                    </Link>
-                  </Button>
-                  <Button variant="outline" size="sm" disabled>
-                    <ExternalLink className="h-4 w-4 mr-2" />
-                    Demo
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
+            {/* Plant Doctor */}
+            <div className="glass-card p-6 flex flex-col">
+              <div className="h-44 rounded-xl mb-5 flex items-center justify-center bg-white/[0.03] border border-white/[0.05]">
+                <Container className="h-10 w-10 text-muted-foreground/50" />
+              </div>
+              <h3 className="text-xl font-semibold mb-2">Plant Doctor</h3>
+              <p className="text-muted-foreground text-sm leading-relaxed mb-5 flex-1">
+                A React Native mobile app that identifies plant diseases via ML inference. Models trained in Python with TensorFlow.
+              </p>
+              <div className="flex flex-wrap gap-2 mb-4">
+                {["Python", "React Native", "TensorFlow"].map((t) => (
+                  <Badge key={t} variant="outline" className="text-xs border-white/10">{t}</Badge>
+                ))}
+              </div>
+              <div className="flex gap-2">
+                <Button asChild variant="outline" size="sm" className="bg-transparent border-white/10 hover:bg-white/5">
+                  <Link href="https://github.com/tedKozub/plantDoctor" target="_blank">
+                    <Github className="h-4 w-4 mr-2" />Code
+                  </Link>
+                </Button>
+                <Button variant="outline" size="sm" disabled className="border-white/10">
+                  <ExternalLink className="h-4 w-4 mr-2" />Demo
+                </Button>
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* Contact Section */}
+      {/* ── Contact – simple, no glass ─────────────────────────────── */}
       <section id="contact" className="relative z-10 py-20 px-4">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-8">Let&apos;s Connect</h2>
@@ -243,40 +206,20 @@ export default function Home() {
             Open to interesting infrastructure challenges, DevOps roles, or
             just a good tech conversation. Drop me a line.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
+          <div className="flex justify-center mb-12">
             <div className="text-lg px-4 py-2 font-semibold flex items-center justify-center bg-primary rounded-md">
               <Mail className="mr-2 h-5 w-5" />
               tadeas.kozub&#64;gmail.com
             </div>
           </div>
           <div className="flex justify-center gap-6">
-            <Button
-              asChild
-              variant="outline"
-              size="icon"
-              className="h-12 w-12 bg-transparent"
-            >
-              <Link
-                href="https://github.com/tedkozub"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="GitHub"
-              >
+            <Button asChild variant="outline" size="icon" className="h-12 w-12 bg-transparent">
+              <Link href="https://github.com/tedkozub" target="_blank" rel="noopener noreferrer" aria-label="GitHub">
                 <Github className="h-6 w-6" />
               </Link>
             </Button>
-            <Button
-              asChild
-              variant="outline"
-              size="icon"
-              className="h-12 w-12 bg-transparent"
-            >
-              <Link
-                href="https://www.linkedin.com/in/tadeas-kozub-38b374283"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="LinkedIn"
-              >
+            <Button asChild variant="outline" size="icon" className="h-12 w-12 bg-transparent">
+              <Link href="https://www.linkedin.com/in/tadeas-kozub-38b374283" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
                 <Linkedin className="h-6 w-6" />
               </Link>
             </Button>
@@ -284,10 +227,10 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Footer */}
+      {/* ── Footer ─────────────────────────────────────────────────── */}
       <footer className="relative z-10 py-8 px-4 border-t border-border">
         <div className="max-w-6xl mx-auto text-center">
-          <p className="text-muted-foreground">
+          <p className="text-muted-foreground text-sm">
             © 2026 Tadeáš Kozub. Built with Next.js and Tailwind CSS.
           </p>
         </div>
