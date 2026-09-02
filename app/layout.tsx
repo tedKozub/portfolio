@@ -18,16 +18,22 @@ export const metadata: Metadata = {
   description: "Portfolio of Tadeáš Kozub, a DevOps Engineer focusing on reliable infrastructure, cloud, networking, and AI/RAG pipelines.",
 };
 
+import { ThemeProvider } from "@/components/theme-provider";
+import { ThemeToggle } from "@/components/theme-toggle";
+
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${inter.variable} ${jbMono.variable}`}>
-      <body className="font-sans antialiased bg-background text-foreground">
-        {children}
-        <Analytics />
+    <html lang="en" className={`${inter.variable} ${jbMono.variable}`} suppressHydrationWarning>
+      <body className="font-sans antialiased bg-background text-foreground transition-colors duration-500">
+        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
+          <ThemeToggle />
+          {children}
+          <Analytics />
+        </ThemeProvider>
       </body>
     </html>
   );
