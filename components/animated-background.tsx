@@ -119,7 +119,8 @@ export function AnimatedBackground() {
   const particlesRef = useRef<Particle[]>([]);
   
   const stateRef = useRef<{ x: number; y: number; vx: number; vy: number; rot: number }[]>([]);
-  const mouse = useRef({ x: -9999, y: -9999 });
+  const pointDefs = useRef<{ val: number; vel: number }[][]>([]);
+  const mouse = useRef({ x: -9999, y: -9999, tx: -9999, ty: -9999, vx: 0, vy: 0 });
   const raf = useRef(0);
   
   const [isMobile, setIsMobile] = useState(false);
@@ -135,6 +136,9 @@ export function AnimatedBackground() {
       vy: (Math.random() - 0.5) * 0.5,
       rot: Math.random() * 360,
     }));
+    pointDefs.current = BLOBS.map(() => 
+      Array.from({ length: NUM_CTRL_POINTS }, () => ({ val: 0, vel: 0 }))
+    );
   }, []);
 
   useEffect(() => {
@@ -157,16 +161,31 @@ export function AnimatedBackground() {
     init();
 
     const onMouse = (e: MouseEvent) => {
-      mouse.current = { x: e.clientX, y: e.clientY };
+      if (mouse.current.tx === -9999) {
+        mouse.current.x = e.clientX;
+        mouse.current.y = e.clientY;
+      }
+      mouse.current.tx = e.clientX;
+      mouse.current.ty = e.clientY;
     };
     window.addEventListener("mousemove", onMouse);
 
     const tick = (time: number) => {
       const W = window.innerWidth;
       const H = window.innerHeight;
-      const { x: mx, y: my } = mouse.current;
+
+      // Smooth mouse & calc velocity
+      if (mouse.current.tx !== -9999) {
+        const dx = mouse.current.tx - mouse.current.x;
+        const dy = mouse.current.ty - mouse.current.y;
+        mouse.current.vx = dx * 0.2;
+        mouse.current.vy = dy * 0.2;
+        mouse.current.x += dx * 0.2;
+        mouse.current.y += dy * 0.2;
+      }
+      const { x: mx, y: my, vx: mvx, vy: mvy } = mouse.current;
       const mobile = isMobileRef.current;
-      const activeBlobs = mobile ? 2 : 4; // Render fewer blobs on mobile for performance
+      const activeBlobs = mobile ? 2 : 4;
 
       // Update Canvas Particles
       if (canvasRef.current) {
@@ -195,26 +214,40 @@ export function AnimatedBackground() {
         const eased = t * t * (3 - 2 * t);
         const baseRadii = lerpRadii(targets[seg % 3], targets[(seg + 1) % 3], eased);
 
-        // Deform stroke based on mouse proximity
+        // Deform stroke based on mouse movement direction (spring physics)
+        const defs = pointDefs.current[i];
         const deformedRadii = baseRadii.map((localR, pIdx) => {
           const localAngle = (Math.PI * 2 * pIdx) / NUM_CTRL_POINTS;
           const globalAngle = localAngle + (b.rot * Math.PI / 180);
           
-          // Absolute position of this control point
           const px = b.x + cx + Math.cos(globalAngle) * localR;
           const py = b.y + cy + Math.sin(globalAngle) * localR;
 
           const dist = Math.hypot(px - mx, py - my);
-          // Tighter radius so it only deforms when very close
-          const interactionRadius = mobile ? 80 : 120;
+          const interactionRadius = mobile ? 80 : 140;
 
-          if (dist < interactionRadius) {
-            // Mouse dents the stroke inward (smoother falloff with power of 2)
-            const force = Math.pow((interactionRadius - dist) / interactionRadius, 2);
-            const maxPush = mobile ? 45 : 80;
-            return Math.max(localR * 0.4, localR - force * maxPush); // prevent breaking the path
+          let force = 0;
+          if (dist < interactionRadius && dist > 1) {
+            const proximity = Math.pow((interactionRadius - dist) / interactionRadius, 2);
+            // Dot product of mouse velocity and radial outward vector
+            const dot = mvx * Math.cos(globalAngle) + mvy * Math.sin(globalAngle);
+            force = dot * proximity * 0.8; // tuning push strength
           }
-          return localR;
+
+          const d = defs[pIdx];
+          // Spring physics: stiffness (k) and damping
+          const k = 0.08;
+          const damp = 0.82;
+          d.vel += force;
+          d.vel -= d.val * k;
+          d.vel *= damp;
+          d.val += d.vel;
+
+          // Cap the deformation so the shape doesn't break
+          const maxDef = mobile ? 50 : 90;
+          d.val = Math.max(-maxDef, Math.min(maxDef, d.val));
+
+          return Math.max(localR * 0.2, localR + d.val);
         });
 
         const pts = radiiToPoints(deformedRadii, cx, cy);

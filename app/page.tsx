@@ -32,17 +32,9 @@ export default function Home() {
       {/* ── Hero – stays clean and minimal ─────────────────────────── */}
       <section className="relative z-10 min-h-screen flex items-center justify-center px-4">
         <div className="max-w-4xl mx-auto text-center">
-          <h1 className="text-5xl md:text-7xl font-bold mb-6 text-balance heading-chromatic">
+          <h1 className="text-5xl md:text-7xl font-bold mb-12 text-balance heading-chromatic">
             Tadeáš Kozub
           </h1>
-          <p className="text-xl md:text-2xl text-muted-foreground mb-8 text-balance">
-            DevOps Engineer
-          </p>
-          <p className="text-lg text-muted-foreground mb-12 max-w-2xl mx-auto text-pretty">
-            Building reliable infrastructure and exploring the intersection of
-            DevOps, networking, and AI — currently deep-diving into RAG
-            pipelines and vector databases.
-          </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button size="lg" className="text-lg px-8" asChild>
               <Link href="#projects">View My Work</Link>
@@ -228,10 +220,10 @@ export default function Home() {
       </section>
 
       {/* ── Footer ─────────────────────────────────────────────────── */}
-      <footer className="relative z-10 pb-12 px-4 mt-8 flex justify-center">
-        <div className="px-8 py-4 rounded-full bg-white/[0.02] border border-white/[0.08] backdrop-blur-2xl backdrop-saturate-150 shadow-[0_12px_40px_rgba(0,0,0,0.4),0_1px_0_rgba(255,255,255,0.1)_inset] transition-all duration-300 hover:bg-white/[0.04] hover:scale-105 hover:border-white/[0.12] hover:shadow-[0_16px_50px_rgba(0,0,0,0.5),0_1px_0_rgba(255,255,255,0.15)_inset] cursor-default">
-          <p className="text-muted-foreground text-sm font-medium tracking-wide">
-            © 2026 Tadeáš Kozub. Built with Next.js & Tailwind.
+      <footer className="relative z-10 py-8 px-4 border-t border-white/10 bg-black/20 backdrop-blur-md">
+        <div className="max-w-6xl mx-auto text-center">
+          <p className="text-muted-foreground text-sm">
+            © 2026 Tadeáš Kozub. Built with Next.js and Tailwind CSS.
           </p>
         </div>
       </footer>
