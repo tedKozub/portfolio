@@ -3,83 +3,59 @@
 import { useEffect, useRef, useCallback } from "react";
 
 /*
-  Abstract outline blobs – organic shapes defined by animated border-radius.
-  Grey stroke outlines, mostly transparent fill, minimal blur.
-  Two blobs follow the mouse, rest drift autonomously.
+  Abstract outline blobs with:
+  - Dashed borders
+  - Chromatic aberration (3 offset layers per blob: R, G, B)
+  - Border-radius morphing for organic shapes
+  - Mouse-following interactivity
 */
 
 interface BlobConfig {
   size: number;
   borderWidth: number;
-  borderOpacity: number;
-  fillOpacity: number;
-  morphDuration: number; // seconds for one border-radius cycle
-  morphKeyframes: string; // CSS border-radius keyframes
+  morphDuration: number;
+  dashArray: string; // stroke-dasharray style
 }
 
-// Each blob gets unique morph keyframes so they feel independent
 const BLOBS: BlobConfig[] = [
-  {
-    size: 300, borderWidth: 1.5, borderOpacity: 0.15, fillOpacity: 0.02,
-    morphDuration: 12,
-    morphKeyframes: "60% 40% 30% 70% / 60% 30% 70% 40%",
-  },
-  {
-    size: 240, borderWidth: 1, borderOpacity: 0.12, fillOpacity: 0.015,
-    morphDuration: 16,
-    morphKeyframes: "40% 60% 60% 40% / 50% 60% 30% 60%",
-  },
-  {
-    size: 280, borderWidth: 1.5, borderOpacity: 0.13, fillOpacity: 0.02,
-    morphDuration: 14,
-    morphKeyframes: "50% 50% 40% 60% / 60% 40% 55% 45%",
-  },
-  {
-    size: 200, borderWidth: 1, borderOpacity: 0.10, fillOpacity: 0.01,
-    morphDuration: 18,
-    morphKeyframes: "55% 45% 50% 50% / 45% 55% 50% 50%",
-  },
-  {
-    size: 340, borderWidth: 1, borderOpacity: 0.10, fillOpacity: 0.015,
-    morphDuration: 20,
-    morphKeyframes: "65% 35% 45% 55% / 40% 60% 35% 65%",
-  },
-  {
-    size: 180, borderWidth: 1.5, borderOpacity: 0.14, fillOpacity: 0.02,
-    morphDuration: 10,
-    morphKeyframes: "45% 55% 55% 45% / 55% 45% 60% 40%",
-  },
-  {
-    size: 260, borderWidth: 1, borderOpacity: 0.11, fillOpacity: 0.01,
-    morphDuration: 22,
-    morphKeyframes: "70% 30% 50% 50% / 50% 50% 40% 60%",
-  },
+  { size: 300, borderWidth: 1.5, morphDuration: 12, dashArray: "12 8" },
+  { size: 240, borderWidth: 1,   morphDuration: 16, dashArray: "20 6" },
+  { size: 280, borderWidth: 1.5, morphDuration: 14, dashArray: "8 12" },
+  { size: 200, borderWidth: 1,   morphDuration: 18, dashArray: "16 10" },
+  { size: 340, borderWidth: 1,   morphDuration: 20, dashArray: "6 14" },
+  { size: 180, borderWidth: 1.5, morphDuration: 10, dashArray: "24 4" },
+  { size: 260, borderWidth: 1,   morphDuration: 22, dashArray: "10 10" },
 ];
 
-// Generate unique CSS keyframes for each blob
-function generateKeyframes(index: number, blob: BlobConfig): string {
-  // Parse the "target" border-radius from config and create mid-states
-  const starts = [
-    "60% 40% 30% 70% / 60% 30% 70% 40%",
-    "40% 60% 55% 45% / 35% 65% 35% 65%",
-    "30% 70% 70% 30% / 50% 40% 60% 50%",
-    "55% 45% 40% 60% / 65% 35% 65% 35%",
-    "50% 50% 40% 60% / 60% 40% 50% 50%",
-    "65% 35% 60% 40% / 40% 60% 35% 65%",
-    "45% 55% 55% 45% / 55% 45% 60% 40%",
-  ];
+// Chromatic aberration channel offsets (px)
+const CHANNELS = [
+  { color: "rgba(255, 80, 80, 0.25)",  dx: -2.5, dy: -1.5 }, // Red
+  { color: "rgba(80, 255, 120, 0.20)", dx: 0,    dy: 0    }, // Green (anchor)
+  { color: "rgba(80, 120, 255, 0.25)",  dx: 2.5,  dy: 1.5  }, // Blue
+];
 
-  const a = starts[index % starts.length];
-  const b = blob.morphKeyframes;
-  const c = starts[(index + 3) % starts.length];
+// Unique morph keyframes per blob
+const MORPH_STATES = [
+  ["60% 40% 30% 70% / 60% 30% 70% 40%", "40% 60% 55% 45% / 35% 65% 35% 65%", "30% 70% 70% 30% / 50% 40% 60% 50%"],
+  ["40% 60% 60% 40% / 50% 60% 30% 60%", "70% 30% 40% 60% / 55% 45% 55% 45%", "45% 55% 70% 30% / 40% 60% 40% 60%"],
+  ["50% 50% 40% 60% / 60% 40% 55% 45%", "65% 35% 60% 40% / 40% 60% 35% 65%", "35% 65% 45% 55% / 65% 35% 60% 40%"],
+  ["55% 45% 50% 50% / 45% 55% 50% 50%", "35% 65% 45% 55% / 65% 35% 60% 40%", "60% 40% 55% 45% / 50% 50% 40% 60%"],
+  ["65% 35% 45% 55% / 40% 60% 35% 65%", "45% 55% 60% 40% / 55% 45% 60% 40%", "50% 50% 35% 65% / 60% 40% 45% 55%"],
+  ["45% 55% 55% 45% / 55% 45% 60% 40%", "60% 40% 40% 60% / 40% 60% 45% 55%", "55% 45% 65% 35% / 50% 50% 55% 45%"],
+  ["70% 30% 50% 50% / 50% 50% 40% 60%", "40% 60% 65% 35% / 55% 45% 50% 50%", "55% 45% 45% 55% / 45% 55% 60% 40%"],
+];
 
-  return `
-    @keyframes blob-morph-${index} {
-      0%, 100% { border-radius: ${a}; }
-      33%      { border-radius: ${b}; }
-      66%      { border-radius: ${c}; }
-    }
-  `;
+function buildKeyframes(): string {
+  return BLOBS.map((_, i) => {
+    const [a, b, c] = MORPH_STATES[i % MORPH_STATES.length];
+    return `
+      @keyframes blob-morph-${i} {
+        0%, 100% { border-radius: ${a}; }
+        33%      { border-radius: ${b}; }
+        66%      { border-radius: ${c}; }
+      }
+    `;
+  }).join("\n");
 }
 
 export function AnimatedBackground() {
@@ -100,9 +76,8 @@ export function AnimatedBackground() {
   }, []);
 
   useEffect(() => {
-    // Inject morph keyframes into document
     const style = document.createElement("style");
-    style.textContent = BLOBS.map((b, i) => generateKeyframes(i, b)).join("\n");
+    style.textContent = buildKeyframes();
     document.head.appendChild(style);
 
     init();
@@ -171,7 +146,7 @@ export function AnimatedBackground() {
 
   return (
     <div className="fixed inset-0 overflow-hidden pointer-events-none" aria-hidden>
-      {BLOBS.map(({ size, borderWidth, borderOpacity, fillOpacity, morphDuration }, i) => (
+      {BLOBS.map(({ size, borderWidth, morphDuration, dashArray }, i) => (
         <div
           key={i}
           ref={(el) => { blobRefs.current[i] = el; }}
@@ -181,12 +156,27 @@ export function AnimatedBackground() {
             left: 0,
             width: size,
             height: size,
-            border: `${borderWidth}px solid rgba(255, 255, 255, ${borderOpacity})`,
-            background: `rgba(255, 255, 255, ${fillOpacity})`,
-            animation: `blob-morph-${i} ${morphDuration}s ease-in-out infinite`,
-            willChange: "transform, border-radius",
+            willChange: "transform",
           }}
-        />
+        >
+          {/* 3 chromatic aberration layers — R, G, B offset */}
+          {CHANNELS.map(({ color, dx, dy }, ch) => (
+            <div
+              key={ch}
+              style={{
+                position: "absolute",
+                inset: 0,
+                border: `${borderWidth}px dashed ${color}`,
+                borderRadius: "inherit",
+                animation: `blob-morph-${i} ${morphDuration}s ease-in-out infinite`,
+                animationDelay: `${ch * -0.3}s`,
+                transform: `translate(${dx}px, ${dy}px)`,
+                // Emulate dash pattern via border-image with gradient
+                // CSS dashed border + the morphing border-radius gives the artistic look
+              }}
+            />
+          ))}
+        </div>
       ))}
     </div>
   );
