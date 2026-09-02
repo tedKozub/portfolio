@@ -103,7 +103,7 @@ class Particle {
   }
 
   draw(ctx: CanvasRenderingContext2D) {
-    ctx.globalAlpha = Math.max(0, this.life * 0.25); // much less prominent
+    ctx.globalAlpha = Math.max(0, this.life * 0.40);
     ctx.fillStyle = this.color;
     ctx.beginPath();
     ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
@@ -260,7 +260,7 @@ export function AnimatedBackground() {
         }
 
         // Spawn particles trailing from the stroke
-        if (Math.random() < (mobile ? 0.02 : 0.05)) { // fewer particles
+        if (Math.random() < (mobile ? 0.03 : 0.08)) {
           const pIdx = Math.floor(Math.random() * NUM_CTRL_POINTS);
           const localR = deformedRadii[pIdx];
           const localAngle = (Math.PI * 2 * pIdx) / NUM_CTRL_POINTS;
