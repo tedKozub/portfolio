@@ -9,26 +9,24 @@
   }
 }
 
-@layer components {
-  /* Subtle glass card — barely visible tint, clean border */
-  .glass-card {
-    background: rgba(255, 255, 255, 0.03);
-    backdrop-filter: blur(16px) saturate(140%);
-    -webkit-backdrop-filter: blur(16px) saturate(140%);
-    border: 1px solid rgba(255, 255, 255, 0.07);
-    box-shadow:
-      0 1px 0 rgba(255, 255, 255, 0.05) inset,
-      0 8px 32px rgba(0, 0, 0, 0.35);
-    border-radius: 16px;
-    transition: background 0.25s, border-color 0.25s, box-shadow 0.25s;
-  }
-  .glass-card:hover {
-    background: rgba(255, 255, 255, 0.065);
-    border-color: rgba(255, 255, 255, 0.14);
-    box-shadow:
-      0 1px 0 rgba(255, 255, 255, 0.08) inset,
-      0 12px 40px rgba(0, 0, 0, 0.45);
-  }
+/* ── Glass card – outside any @layer so it always wins specificity ── */
+.glass-card {
+  background: rgba(255, 255, 255, 0.03) !important;
+  backdrop-filter: blur(16px) saturate(140%);
+  -webkit-backdrop-filter: blur(16px) saturate(140%);
+  border: 1px solid rgba(255, 255, 255, 0.07) !important;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.05) inset,
+    0 8px 32px rgba(0, 0, 0, 0.35);
+  border-radius: 16px;
+  transition: background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+.glass-card:hover {
+  background: rgba(255, 255, 255, 0.07) !important;
+  border-color: rgba(255, 255, 255, 0.15) !important;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.09) inset,
+    0 12px 40px rgba(0, 0, 0, 0.5);
 }
 
 :root {
