@@ -39,8 +39,9 @@ function generateRadii(baseR: number, seed: number): number[] {
   const radii: number[] = [];
   for (let i = 0; i < NUM_CTRL_POINTS; i++) {
     const angle = (Math.PI * 2 * i) / NUM_CTRL_POINTS;
-    const n1 = Math.sin(angle * 1 + seed * 3.17) * 0.12;
-    const n2 = Math.cos(angle * 2 + seed * 7.31) * 0.08;
+    // Less noise amplitude for a calmer, less wobbly shape
+    const n1 = Math.sin(angle * 1 + seed * 3.17) * 0.05;
+    const n2 = Math.cos(angle * 2 + seed * 7.31) * 0.03;
     radii.push(baseR * (1 + n1 + n2));
   }
   return radii;
@@ -55,10 +56,10 @@ function radiiToPoints(radii: number[], cx: number, cy: number): { x: number; y:
 }
 
 const BLOBS = [
-  { size: 700, baseR: 290, borderWidth: 1.5, morphSpeed: 0.0003,  seeds: [1.2, 5.7, 9.3] },
-  { size: 600, baseR: 240, borderWidth: 2,   morphSpeed: 0.00025, seeds: [3.4, 7.1, 2.8] },
-  { size: 850, baseR: 360, borderWidth: 1.5, morphSpeed: 0.00028, seeds: [6.5, 0.9, 4.6] },
-  { size: 550, baseR: 220, borderWidth: 2,   morphSpeed: 0.00022, seeds: [8.2, 3.3, 7.9] },
+  { size: 700, baseR: 290, borderWidth: 1.5, morphSpeed: 0.00015, seeds: [1.2, 5.7, 9.3] },
+  { size: 600, baseR: 240, borderWidth: 2,   morphSpeed: 0.00012, seeds: [3.4, 7.1, 2.8] },
+  { size: 850, baseR: 360, borderWidth: 1.5, morphSpeed: 0.00014, seeds: [6.5, 0.9, 4.6] },
+  { size: 550, baseR: 220, borderWidth: 2,   morphSpeed: 0.00011, seeds: [8.2, 3.3, 7.9] },
 ];
 
 const CHANNELS = [
@@ -236,8 +237,8 @@ export function AnimatedBackground() {
 
           const d = defs[pIdx];
           // Spring physics: stiffness (k) and damping
-          const k = 0.08;
-          const damp = 0.82;
+          const k = 0.15; // increased stiffness so it snaps back faster
+          const damp = 0.70; // increased damping so it bounces less
           d.vel += force;
           d.vel -= d.val * k;
           d.vel *= damp;

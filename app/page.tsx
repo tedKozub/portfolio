@@ -19,20 +19,20 @@ import {
 import Link from "next/link";
 
 const SKILLS = [
-  "Kubernetes", "Terraform", "Ansible", "Docker",
-  "CI/CD", "Networking", "Python", "Rust",
-  "Go", "Vector DBs", "RAG", "PostgreSQL",
+  "React", "TypeScript", "Next.js", "Kubernetes", "Terraform",
+  "Ansible", "CI/CD", "Docker", "Python", "Rust", "Go",
+  "Networking", "Vector DBs", "RAG"
 ];
 
 export default function Home() {
   return (
-    <main className="min-h-screen relative">
+    <main className="min-h-screen relative overflow-hidden">
       <AnimatedBackground />
 
       {/* ── Hero – stays clean and minimal ─────────────────────────── */}
       <section className="relative z-10 min-h-screen flex items-center justify-center px-4">
         <div className="max-w-4xl mx-auto text-center">
-          <h1 className="text-5xl md:text-7xl font-bold mb-12 text-balance heading-chromatic">
+          <h1 className="text-5xl md:text-7xl font-bold mb-12 text-balance heading-chromatic animate-fade-in-up">
             Tadeáš Kozub
           </h1>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -42,12 +42,41 @@ export default function Home() {
             <Button
               variant="outline"
               size="lg"
-              className="text-lg px-8 bg-transparent"
+              className="text-lg px-8 bg-transparent border-black/10 dark:border-white/10"
               asChild
             >
               <Link href="#contact" className="flex items-center">
                 <Mail className="mr-2 h-5 w-5" />
                 Get In Touch
+              </Link>
+            </Button>
+          </div>
+        </div>
+      </section>
+
+      {/* ── Contact – Moved up ─────────────────────────────── */}
+      <section id="contact" className="relative z-10 py-20 px-4">
+        <div className="max-w-4xl mx-auto text-center">
+          <h2 className="text-3xl md:text-4xl font-bold mb-8 heading-chromatic">Let&apos;s Connect</h2>
+          <p className="text-lg text-muted-foreground mb-12 text-pretty">
+            Open to interesting infrastructure challenges, freelance web development, DevOps roles, or
+            just a good tech conversation. Drop me a line.
+          </p>
+          <div className="flex justify-center mb-12">
+            <div className="text-lg px-8 py-4 font-medium flex items-center justify-center bg-black/5 dark:bg-black/50 border border-black/10 dark:border-white/10 rounded-2xl shadow-xl backdrop-blur-md transition-all hover:bg-black/10 dark:hover:bg-black/80 hover:border-black/20 dark:hover:border-white/20 cursor-pointer text-foreground">
+              <Mail className="mr-3 h-6 w-6 text-muted-foreground" />
+              <span>tadeas.kozub&#64;gmail.com</span>
+            </div>
+          </div>
+          <div className="flex justify-center gap-6">
+            <Button asChild variant="outline" size="icon" className="h-12 w-12 bg-transparent border-black/10 dark:border-white/10 hover:bg-black/5 dark:hover:bg-white/5">
+              <Link href="https://github.com/tedkozub" target="_blank" rel="noopener noreferrer" aria-label="GitHub">
+                <Github className="h-6 w-6" />
+              </Link>
+            </Button>
+            <Button asChild variant="outline" size="icon" className="h-12 w-12 bg-transparent border-black/10 dark:border-white/10 hover:bg-black/5 dark:hover:bg-white/5">
+              <Link href="https://www.linkedin.com/in/tadeas-kozub-38b374283" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
+                <Linkedin className="h-6 w-6" />
               </Link>
             </Button>
           </div>
@@ -70,13 +99,14 @@ export default function Home() {
                 possible way.
               </p>
               <p className="text-lg text-muted-foreground mb-8 leading-relaxed">
-                Outside of work I&apos;m exploring RAG architectures and vector
-                databases, diving deep into networking, and occasionally
-                shipping side projects.
+                As a freelancer, I also specialize in modern web development and
+                frontend engineering, building fast and interactive UIs using React
+                and TypeScript. Outside of work, I&apos;m exploring RAG architectures
+                and vector databases.
               </p>
               <div className="flex flex-wrap gap-2">
                 {SKILLS.map((skill) => (
-                  <Badge key={skill} variant="secondary" className="text-sm px-3 py-1 badge-chromatic">
+                  <Badge key={skill} variant="secondary" className="text-sm px-3 py-1 badge-chromatic bg-black/5 dark:bg-white/5">
                     {skill}
                   </Badge>
                 ))}
@@ -86,10 +116,10 @@ export default function Home() {
             {/* Glass skill cards */}
             <div className="grid grid-cols-2 gap-4">
               {[
+                { icon: Code,        title: "Web Dev",          sub: "React, TypeScript, Next.js, Tailwind" },
                 { icon: Server,      title: "DevOps & Infra",  sub: "Kubernetes, Terraform, Ansible, CI/CD" },
                 { icon: Network,     title: "Networking",       sub: "BGP, VLANs, DNS, Load Balancing" },
                 { icon: BrainCircuit,title: "AI / RAG",         sub: "Vector DBs, Embeddings, LLM Pipelines" },
-                { icon: Code,        title: "Development",      sub: "Rust, Go, Python, Node.js" },
               ].map(({ icon: Icon, title, sub }) => (
                 <div key={title} className="glass-card p-6 text-center">
                   <Icon className="h-7 w-7 mx-auto mb-4 text-primary" />
@@ -190,34 +220,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── Contact – simple, no glass ─────────────────────────────── */}
-      <section id="contact" className="relative z-10 py-20 px-4">
-        <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-3xl md:text-4xl font-bold mb-8 heading-chromatic">Let&apos;s Connect</h2>
-          <p className="text-lg text-muted-foreground mb-12 text-pretty">
-            Open to interesting infrastructure challenges, DevOps roles, or
-            just a good tech conversation. Drop me a line.
-          </p>
-          <div className="flex justify-center mb-12">
-            <div className="text-lg px-8 py-4 font-medium flex items-center justify-center bg-black/5 dark:bg-black/50 border border-black/10 dark:border-white/10 rounded-2xl shadow-xl backdrop-blur-md transition-all hover:bg-black/10 dark:hover:bg-black/80 hover:border-black/20 dark:hover:border-white/20 cursor-pointer text-foreground">
-              <Mail className="mr-3 h-6 w-6 text-muted-foreground" />
-              <span>tadeas.kozub&#64;gmail.com</span>
-            </div>
-          </div>
-          <div className="flex justify-center gap-6">
-            <Button asChild variant="outline" size="icon" className="h-12 w-12 bg-transparent">
-              <Link href="https://github.com/tedkozub" target="_blank" rel="noopener noreferrer" aria-label="GitHub">
-                <Github className="h-6 w-6" />
-              </Link>
-            </Button>
-            <Button asChild variant="outline" size="icon" className="h-12 w-12 bg-transparent">
-              <Link href="https://www.linkedin.com/in/tadeas-kozub-38b374283" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
-                <Linkedin className="h-6 w-6" />
-              </Link>
-            </Button>
-          </div>
-        </div>
-      </section>
 
       {/* ── Footer ─────────────────────────────────────────────────── */}
       <footer className="relative z-10 py-8 px-4 border-t border-black/10 dark:border-white/10 bg-white/30 dark:bg-black/20 backdrop-blur-md transition-colors duration-500">
