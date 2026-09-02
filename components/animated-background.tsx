@@ -215,6 +215,9 @@ export function AnimatedBackground() {
         const eased = t * t * (3 - 2 * t);
         const baseRadii = lerpRadii(targets[seg % 3], targets[(seg + 1) % 3], eased);
 
+        let blobPushX = 0;
+        let blobPushY = 0;
+
         // Deform stroke based on mouse movement direction (spring physics)
         const defs = pointDefs.current[i];
         const deformedRadii = baseRadii.map((localR, pIdx) => {
@@ -233,6 +236,10 @@ export function AnimatedBackground() {
             // Dot product of mouse velocity and radial outward vector
             const dot = mvx * Math.cos(globalAngle) + mvy * Math.sin(globalAngle);
             force = dot * proximity * 0.5; // less extreme push/pull
+
+            // Transfer a portion of mouse momentum to the entire blob body
+            blobPushX += mvx * proximity * 0.002;
+            blobPushY += mvy * proximity * 0.002;
           }
 
           const d = defs[pIdx];
@@ -281,6 +288,18 @@ export function AnimatedBackground() {
           const force = (300 - distM) / 300;
           b.vx += (dxM / distM) * force * 0.01;
           b.vy += (dyM / distM) * force * 0.01;
+        }
+
+        // Apply mouse collision momentum
+        b.vx += blobPushX;
+        b.vy += blobPushY;
+
+        // Soft friction back to normal floating speed if pushed too fast
+        const currentSpeed = Math.hypot(b.vx, b.vy);
+        const normalSpeed = 0.6;
+        if (currentSpeed > normalSpeed) {
+          b.vx *= 0.96;
+          b.vy *= 0.96;
         }
 
         // Drift & rotate
