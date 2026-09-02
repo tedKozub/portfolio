@@ -17,6 +17,7 @@ import {
   Container,
 } from "lucide-react";
 import Link from "next/link";
+import { EmailCopyButton } from "@/components/email-copy-button";
 
 const SKILLS = [
   "React", "TypeScript", "Next.js", "Kubernetes", "Terraform",
@@ -186,10 +187,7 @@ export default function Home() {
             just a good tech conversation. Drop me a line.
           </p>
           <div className="flex justify-center mb-12">
-            <div className="text-base sm:text-lg px-4 sm:px-8 py-3 sm:py-4 font-normal flex items-center justify-center bg-black/5 dark:bg-black/50 border border-black/10 dark:border-white/10 rounded-2xl shadow-xl backdrop-blur-md transition-all hover:bg-black/10 dark:hover:bg-black/80 hover:border-black/20 dark:hover:border-white/20 cursor-pointer text-foreground break-all max-w-full">
-              <Mail className="mr-2 sm:mr-3 h-5 w-5 sm:h-6 sm:w-6 text-muted-foreground shrink-0" />
-              <span className="truncate">tadeas.kozub&#64;gmail.com</span>
-            </div>
+            <EmailCopyButton />
           </div>
           <div className="flex justify-center gap-6">
             <Button asChild variant="outline" size="icon" className="h-12 w-12 bg-transparent border-black/10 dark:border-white/10 hover:bg-black/5 dark:hover:bg-white/5">

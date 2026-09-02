@@ -4,6 +4,7 @@ import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { Toaster } from "sonner";
 
 const manrope = Manrope({
   subsets: ["latin"],
@@ -31,6 +32,7 @@ export default function RootLayout({
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
           <ThemeToggle />
           {children}
+          <Toaster position="bottom-center" toastOptions={{ className: 'font-sans' }} />
           <Analytics />
         </ThemeProvider>
       </body>
