@@ -38,13 +38,13 @@ export default function Home() {
             Tadeáš Kozub
           </h1>
           <div className="flex flex-col sm:flex-row gap-4 justify-center w-full max-w-sm sm:max-w-none mx-auto">
-            <Button size="lg" className="text-base sm:text-lg px-8 font-light w-full sm:w-auto h-12 sm:h-auto" asChild>
+            <Button size="lg" className="text-lg px-8 font-light w-full sm:w-auto" asChild>
               <Link href="#projects">View My Work</Link>
             </Button>
             <Button
               variant="outline"
               size="lg"
-              className="text-base sm:text-lg px-8 bg-transparent border-black/10 dark:border-white/10 font-light w-full sm:w-auto h-12 sm:h-auto"
+              className="text-lg px-8 bg-transparent border-black/10 dark:border-white/10 font-light w-full sm:w-auto"
               asChild
             >
               <Link href="#contact" className="flex items-center justify-center">
