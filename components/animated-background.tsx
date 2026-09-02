@@ -3,51 +3,41 @@
 import { useEffect, useRef, useCallback } from "react";
 
 /*
-  Abstract outline blobs with:
-  - Dashed borders
-  - Chromatic aberration (3 offset layers per blob: R, G, B)
-  - Border-radius morphing for organic shapes
-  - Mouse-following interactivity
+  4 large abstract blobs that drift autonomously.
+  Cursor doesn't have its own shape — instead it repels blobs on proximity
+  and deforms their shape (squish) when pushing against them.
 */
 
 interface BlobConfig {
   size: number;
   borderWidth: number;
   morphDuration: number;
-  dashArray: string; // stroke-dasharray style
+  dashArray: string;
 }
 
 const BLOBS: BlobConfig[] = [
-  { size: 300, borderWidth: 1.5, morphDuration: 12, dashArray: "12 8" },
-  { size: 240, borderWidth: 1,   morphDuration: 16, dashArray: "20 6" },
-  { size: 280, borderWidth: 1.5, morphDuration: 14, dashArray: "8 12" },
-  { size: 200, borderWidth: 1,   morphDuration: 18, dashArray: "16 10" },
-  { size: 340, borderWidth: 1,   morphDuration: 20, dashArray: "6 14" },
-  { size: 180, borderWidth: 1.5, morphDuration: 10, dashArray: "24 4" },
-  { size: 260, borderWidth: 1,   morphDuration: 22, dashArray: "10 10" },
+  { size: 420, borderWidth: 1.5, morphDuration: 14, dashArray: "14 8" },
+  { size: 360, borderWidth: 1,   morphDuration: 18, dashArray: "20 6" },
+  { size: 480, borderWidth: 1,   morphDuration: 22, dashArray: "8 14" },
+  { size: 320, borderWidth: 1.5, morphDuration: 16, dashArray: "18 10" },
 ];
 
-// Chromatic aberration channel offsets (px)
 const CHANNELS = [
-  { color: "rgba(255, 80, 80, 0.25)",  dx: -2.5, dy: -1.5 }, // Red
-  { color: "rgba(80, 255, 120, 0.20)", dx: 0,    dy: 0    }, // Green (anchor)
-  { color: "rgba(80, 120, 255, 0.25)",  dx: 2.5,  dy: 1.5  }, // Blue
+  { color: "rgba(255, 80, 80, 0.22)",  dx: -2.5, dy: -1.5 },
+  { color: "rgba(80, 255, 120, 0.18)", dx: 0,    dy: 0    },
+  { color: "rgba(80, 120, 255, 0.22)",  dx: 2.5,  dy: 1.5  },
 ];
 
-// Unique morph keyframes per blob
 const MORPH_STATES = [
-  ["60% 40% 30% 70% / 60% 30% 70% 40%", "40% 60% 55% 45% / 35% 65% 35% 65%", "30% 70% 70% 30% / 50% 40% 60% 50%"],
-  ["40% 60% 60% 40% / 50% 60% 30% 60%", "70% 30% 40% 60% / 55% 45% 55% 45%", "45% 55% 70% 30% / 40% 60% 40% 60%"],
-  ["50% 50% 40% 60% / 60% 40% 55% 45%", "65% 35% 60% 40% / 40% 60% 35% 65%", "35% 65% 45% 55% / 65% 35% 60% 40%"],
-  ["55% 45% 50% 50% / 45% 55% 50% 50%", "35% 65% 45% 55% / 65% 35% 60% 40%", "60% 40% 55% 45% / 50% 50% 40% 60%"],
-  ["65% 35% 45% 55% / 40% 60% 35% 65%", "45% 55% 60% 40% / 55% 45% 60% 40%", "50% 50% 35% 65% / 60% 40% 45% 55%"],
-  ["45% 55% 55% 45% / 55% 45% 60% 40%", "60% 40% 40% 60% / 40% 60% 45% 55%", "55% 45% 65% 35% / 50% 50% 55% 45%"],
-  ["70% 30% 50% 50% / 50% 50% 40% 60%", "40% 60% 65% 35% / 55% 45% 50% 50%", "55% 45% 45% 55% / 45% 55% 60% 40%"],
+  ["62% 38% 32% 68% / 58% 32% 68% 42%", "38% 62% 58% 42% / 42% 58% 38% 62%", "50% 50% 42% 58% / 62% 38% 55% 45%"],
+  ["42% 58% 62% 38% / 48% 52% 35% 65%", "68% 32% 42% 58% / 55% 45% 58% 42%", "48% 52% 55% 45% / 38% 62% 48% 52%"],
+  ["55% 45% 38% 62% / 62% 38% 48% 52%", "45% 55% 65% 35% / 42% 58% 62% 38%", "58% 42% 48% 52% / 52% 48% 42% 58%"],
+  ["48% 52% 55% 45% / 55% 45% 62% 38%", "62% 38% 42% 58% / 38% 62% 48% 52%", "42% 58% 58% 42% / 48% 52% 55% 45%"],
 ];
 
 function buildKeyframes(): string {
   return BLOBS.map((_, i) => {
-    const [a, b, c] = MORPH_STATES[i % MORPH_STATES.length];
+    const [a, b, c] = MORPH_STATES[i];
     return `
       @keyframes blob-morph-${i} {
         0%, 100% { border-radius: ${a}; }
@@ -58,6 +48,9 @@ function buildKeyframes(): string {
   }).join("\n");
 }
 
+const REPEL_RADIUS = 280;
+const REPEL_STRENGTH = 8;
+
 export function AnimatedBackground() {
   const blobRefs = useRef<(HTMLDivElement | null)[]>([]);
   const stateRef = useRef<{ x: number; y: number; vx: number; vy: number }[]>([]);
@@ -67,11 +60,11 @@ export function AnimatedBackground() {
   const init = useCallback(() => {
     const W = window.innerWidth;
     const H = window.innerHeight;
-    stateRef.current = BLOBS.map((_, i) => ({
-      x: (W / BLOBS.length) * i + W / (BLOBS.length * 2),
-      y: H * 0.2 + Math.random() * H * 0.6,
-      vx: (Math.random() - 0.5) * 1,
-      vy: (Math.random() - 0.5) * 1,
+    stateRef.current = BLOBS.map((blob, i) => ({
+      x: W * 0.15 + (W * 0.7 / BLOBS.length) * i + blob.size * 0.2,
+      y: H * 0.25 + Math.random() * H * 0.4,
+      vx: (Math.random() - 0.5) * 0.8,
+      vy: (Math.random() - 0.5) * 0.8,
     }));
   }, []);
 
@@ -94,41 +87,59 @@ export function AnimatedBackground() {
 
       stateRef.current.forEach((b, i) => {
         const size = BLOBS[i].size;
+        const cx = b.x;
+        const cy = b.y;
 
-        if (i === 0) {
-          b.vx += (mx - b.x) * 0.02;
-          b.vy += (my - b.y) * 0.02;
-          b.vx *= 0.88;
-          b.vy *= 0.88;
-        } else if (i === 1) {
-          b.vx += (mx - b.x) * 0.006;
-          b.vy += (my - b.y) * 0.006;
-          b.vx *= 0.95;
-          b.vy *= 0.95;
-        } else {
-          b.vx += (Math.random() - 0.5) * 0.08;
-          b.vy += (Math.random() - 0.5) * 0.08;
-          b.vx *= 0.994;
-          b.vy *= 0.994;
-          const spd = Math.hypot(b.vx, b.vy);
-          if (spd > 1.5) {
-            b.vx = (b.vx / spd) * 1.5;
-            b.vy = (b.vy / spd) * 1.5;
-          }
+        // --- Mouse repulsion ---
+        const dxM = cx - mx;
+        const dyM = cy - my;
+        const distM = Math.hypot(dxM, dyM);
+
+        let squishX = 1;
+        let squishY = 1;
+
+        if (distM < REPEL_RADIUS && distM > 1) {
+          const force = ((REPEL_RADIUS - distM) / REPEL_RADIUS) * REPEL_STRENGTH;
+          const nx = dxM / distM;
+          const ny = dyM / distM;
+          b.vx += nx * force * 0.04;
+          b.vy += ny * force * 0.04;
+
+          // Squish perpendicular to push direction
+          const proximity = 1 - distM / REPEL_RADIUS; // 0..1
+          const squishAmount = proximity * 0.15;
+          // Squish along the push axis, stretch perpendicular
+          const angle = Math.atan2(ny, nx);
+          const cos = Math.cos(angle);
+          const sin = Math.sin(angle);
+          squishX = 1 + squishAmount * Math.abs(cos) * 0.5 - squishAmount * Math.abs(sin) * 0.3;
+          squishY = 1 + squishAmount * Math.abs(sin) * 0.5 - squishAmount * Math.abs(cos) * 0.3;
+        }
+
+        // --- Autonomous drift ---
+        b.vx += (Math.random() - 0.5) * 0.06;
+        b.vy += (Math.random() - 0.5) * 0.06;
+        b.vx *= 0.995;
+        b.vy *= 0.995;
+        const spd = Math.hypot(b.vx, b.vy);
+        if (spd > 1.8) {
+          b.vx = (b.vx / spd) * 1.8;
+          b.vy = (b.vy / spd) * 1.8;
         }
 
         b.x += b.vx;
         b.y += b.vy;
 
-        const margin = size * 0.3;
-        if (b.x < -margin) b.vx += 0.4;
-        if (b.x > W + margin) b.vx -= 0.4;
-        if (b.y < -margin) b.vy += 0.4;
-        if (b.y > H + margin) b.vy -= 0.4;
+        // Soft boundaries
+        const margin = size * 0.25;
+        if (b.x < -margin)   b.vx += 0.3;
+        if (b.x > W + margin) b.vx -= 0.3;
+        if (b.y < -margin)   b.vy += 0.3;
+        if (b.y > H + margin) b.vy -= 0.3;
 
         const el = blobRefs.current[i];
         if (el) {
-          el.style.transform = `translate(${b.x - size / 2}px, ${b.y - size / 2}px)`;
+          el.style.transform = `translate(${b.x - size / 2}px, ${b.y - size / 2}px) scale(${squishX.toFixed(3)}, ${squishY.toFixed(3)})`;
         }
       });
 
@@ -146,7 +157,7 @@ export function AnimatedBackground() {
 
   return (
     <div className="fixed inset-0 overflow-hidden pointer-events-none" aria-hidden>
-      {BLOBS.map(({ size, borderWidth, morphDuration, dashArray }, i) => (
+      {BLOBS.map(({ size, borderWidth, morphDuration }, i) => (
         <div
           key={i}
           ref={(el) => { blobRefs.current[i] = el; }}
@@ -157,9 +168,9 @@ export function AnimatedBackground() {
             width: size,
             height: size,
             willChange: "transform",
+            transition: "transform 0.08s linear",
           }}
         >
-          {/* 3 chromatic aberration layers — R, G, B offset */}
           {CHANNELS.map(({ color, dx, dy }, ch) => (
             <div
               key={ch}
@@ -167,12 +178,9 @@ export function AnimatedBackground() {
                 position: "absolute",
                 inset: 0,
                 border: `${borderWidth}px dashed ${color}`,
-                borderRadius: "inherit",
                 animation: `blob-morph-${i} ${morphDuration}s ease-in-out infinite`,
-                animationDelay: `${ch * -0.3}s`,
+                animationDelay: `${ch * -0.4}s`,
                 transform: `translate(${dx}px, ${dy}px)`,
-                // Emulate dash pattern via border-image with gradient
-                // CSS dashed border + the morphing border-radius gives the artistic look
               }}
             />
           ))}
