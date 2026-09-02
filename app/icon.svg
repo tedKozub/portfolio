@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <rect width="256" height="256" rx="64" fill="#0a0a0a"/>
+  <path d="M128 32 C 180 32, 224 76, 224 128 C 224 180, 180 224, 128 224 C 76 224, 32 180, 32 128 C 32 76, 76 32, 128 32" stroke="url(#chromatic)" stroke-width="12" fill="none" stroke-dasharray="60 30" />
+  <text x="128" y="172" font-family="system-ui, sans-serif" font-size="120" font-weight="800" fill="#ffffff" text-anchor="middle">TK</text>
+  <defs>
+    <linearGradient id="chromatic" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ff4646" />
+      <stop offset="50%" stop-color="#c8c8c8" />
+      <stop offset="100%" stop-color="#4664ff" />
+    </linearGradient>
+  </defs>
+</svg>

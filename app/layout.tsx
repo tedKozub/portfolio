@@ -1,12 +1,21 @@
 import type { Metadata } from "next";
-import { GeistSans } from "geist/font/sans";
-import { GeistMono } from "geist/font/mono";
+import { Outfit, JetBrains_Mono } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 
+const outfit = Outfit({
+  subsets: ["latin"],
+  variable: "--font-outfit",
+});
+
+const jbMono = JetBrains_Mono({
+  subsets: ["latin"],
+  variable: "--font-jb-mono",
+});
+
 export const metadata: Metadata = {
-  title: "Tadeas Kozub",
-  description: "Personal portfolio",
+  title: "Tadeáš Kozub | DevOps Engineer",
+  description: "Portfolio of Tadeáš Kozub, a DevOps Engineer focusing on reliable infrastructure, cloud, networking, and AI/RAG pipelines.",
 };
 
 export default function RootLayout({
@@ -15,8 +24,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className={`font-sans ${GeistSans.variable} ${GeistMono.variable}`}>
+    <html lang="en" className={`${outfit.variable} ${jbMono.variable}`}>
+      <body className="font-sans antialiased bg-background text-foreground">
         {children}
         <Analytics />
       </body>
