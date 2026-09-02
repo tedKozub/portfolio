@@ -228,10 +228,10 @@ export default function Home() {
       </section>
 
       {/* ── Footer ─────────────────────────────────────────────────── */}
-      <footer className="relative z-10 py-8 px-4 border-t border-border">
-        <div className="max-w-6xl mx-auto text-center">
-          <p className="text-muted-foreground text-sm">
-            © 2026 Tadeáš Kozub. Built with Next.js and Tailwind CSS.
+      <footer className="relative z-10 pb-12 px-4 mt-8 flex justify-center">
+        <div className="px-8 py-4 rounded-full bg-white/[0.02] border border-white/[0.08] backdrop-blur-2xl backdrop-saturate-150 shadow-[0_12px_40px_rgba(0,0,0,0.4),0_1px_0_rgba(255,255,255,0.1)_inset] transition-all duration-300 hover:bg-white/[0.04] hover:scale-105 hover:border-white/[0.12] hover:shadow-[0_16px_50px_rgba(0,0,0,0.5),0_1px_0_rgba(255,255,255,0.15)_inset] cursor-default">
+          <p className="text-muted-foreground text-sm font-medium tracking-wide">
+            © 2026 Tadeáš Kozub. Built with Next.js & Tailwind.
           </p>
         </div>
       </footer>
