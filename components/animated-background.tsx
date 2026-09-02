@@ -87,12 +87,12 @@ class Particle {
   constructor(x: number, y: number, color: string) {
     this.x = x;
     this.y = y;
-    this.vx = (Math.random() - 0.5) * 1.5;
-    this.vy = (Math.random() - 0.5) * 1.5 - 0.5; // slight upward drift
+    this.vx = (Math.random() - 0.5) * 1.0;
+    this.vy = (Math.random() - 0.5) * 1.0 - 0.3; // softer upward drift
     this.life = 1.0;
-    this.decay = Math.random() * 0.01 + 0.005;
+    this.decay = Math.random() * 0.01 + 0.008; // slightly faster decay
     this.color = color;
-    this.size = Math.random() * 2 + 0.5;
+    this.size = Math.random() * 1.2 + 0.5; // smaller particles
   }
 
   update() {
@@ -102,7 +102,7 @@ class Particle {
   }
 
   draw(ctx: CanvasRenderingContext2D) {
-    ctx.globalAlpha = Math.max(0, this.life * 0.6);
+    ctx.globalAlpha = Math.max(0, this.life * 0.25); // much less prominent
     ctx.fillStyle = this.color;
     ctx.beginPath();
     ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
@@ -205,13 +205,14 @@ export function AnimatedBackground() {
           const py = b.y + cy + Math.sin(globalAngle) * localR;
 
           const dist = Math.hypot(px - mx, py - my);
-          const interactionRadius = mobile ? 140 : 250;
+          // Tighter radius so it only deforms when very close
+          const interactionRadius = mobile ? 80 : 120;
 
           if (dist < interactionRadius) {
-            // Mouse dents the stroke inward
-            const force = Math.pow((interactionRadius - dist) / interactionRadius, 1.5);
-            const maxPush = mobile ? 60 : 120;
-            return Math.max(localR * 0.3, localR - force * maxPush); // prevent breaking the path
+            // Mouse dents the stroke inward (smoother falloff with power of 2)
+            const force = Math.pow((interactionRadius - dist) / interactionRadius, 2);
+            const maxPush = mobile ? 45 : 80;
+            return Math.max(localR * 0.4, localR - force * maxPush); // prevent breaking the path
           }
           return localR;
         });
@@ -225,7 +226,7 @@ export function AnimatedBackground() {
         }
 
         // Spawn particles trailing from the stroke
-        if (Math.random() < (mobile ? 0.05 : 0.12)) {
+        if (Math.random() < (mobile ? 0.02 : 0.05)) { // fewer particles
           const pIdx = Math.floor(Math.random() * NUM_CTRL_POINTS);
           const localR = deformedRadii[pIdx];
           const localAngle = (Math.PI * 2 * pIdx) / NUM_CTRL_POINTS;
